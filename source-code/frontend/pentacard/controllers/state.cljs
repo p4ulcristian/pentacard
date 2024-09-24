@@ -33,8 +33,27 @@
         [x 0 z]))))
 
 (def state 
-  {:cards deck
-   :boards {:pentagon {:points (pentagon-points 0.5)}}})
+  {:state :state
+   :cards deck
+   :boards {:pentagon   {:points (pentagon-points 0.4)}
+            :square     {:points []}
+            :triangle   {:points []}}
+   :card-placeholders {:1 {:position [0.07  0.07 -0.02]}
+                       :2 {:position [-0.07 0.07 -0.02]}
+                       :3 {:position [0.07  -0.07 -0.02]}
+                       :4 {:position [-0.07 -0.07 -0.02]}
+                       :5 {:position [-0.07 -0.21 -0.02]}}})
+
+
+;; Game starts ; kiosztani a kartyakat, elso player randomolasa, elso player lepese, kovetkezo player jobbra
+
+
+(reg-event-db 
+ (fn []
+   ))
+
+
+
 
 (reg-event-db 
  :state/setup! 

@@ -91,7 +91,7 @@
                     (aset rotation "x" (.get rotation-x-spring))
                     (aset rotation "y" rotation-y)))))))
 
-(defn player-card [board-ref position]
+(defn card-placeholder [board-ref position]
   (let [texture (useTexture "/images/logo.webp") 
         pos-ref (react/useRef)
         [stabbed? set-stabbed?] (react/useState false)] 
@@ -108,7 +108,8 @@
 
 (defn player-cards []
   (let [board-ref (react/useRef) 
-        rotation [0 0 0]]
+        rotation [0 0 0]
+        card-placeholders @(subscribe [:db/get [:card-placeholders]])]
    ;;  (useFrame
    ;;   (fn []
    ;;     (set! (-> box-ref .-current .-rotation .-x)
@@ -119,10 +120,10 @@
    ;;           (+ (-> box-ref .-current .-rotation .-z) 0.004))))
     [:group {:rotation rotation
              :ref board-ref} 
-     [player-card board-ref [0.07  0.07 -0.02]]
-     [player-card board-ref [-0.07 0.07 -0.02]]
-     [player-card board-ref [0.07  -0.07 -0.02]]
-     [player-card board-ref [-0.07 -0.07 -0.02]]]))
+     (map 
+      (fn [[key {:keys [position]}]] 
+        [card-placeholder board-ref position])
+      card-placeholders)]))
 
      
      
