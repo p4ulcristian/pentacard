@@ -103,31 +103,18 @@
      [cards/player-cards position]]))
 
 
-(defn pentagon-points
-  "Calculate the coordinates of the vertices of a regular pentagon,
-   relative to the center of the pentagon.
-   side-length: the length of each side.
-   Returns a list of [x y] coordinates."
-  [side-length]
-  (let [n 5
-        angle-increment  (/ (* 2 Math/PI) n)
-        radius           (/ side-length (* 2 (Math/sin (/ Math/PI n))))]
-    (for [i (range n)]
-      (let [angle (- (* i angle-increment) (/ Math/PI 2)) ; rotate to align first point vertically
-            x (* radius (Math/cos angle))
-            z (* radius (Math/sin angle))]
-        [x 0 z]))))
+
 
 ;; Usage
-(println (pentagon-points 5))
 
-(defn pentagon [radius] 
-  [:group 
-   {:rotation [0 pi 0]}
-   (map-indexed
-    (fn [i coordinate] [pentagon-plane i radius coordinate (* i 
-                                                            (* 72 (/ pi 180)))]) 
-    (pentagon-points radius))])
+(defn pentagon [] 
+  (let [pentagon-points (subscribe [:db/get [:boards :pentagon :points]])]
+    [:group 
+     {:rotation [0 pi 0]}
+     (map-indexed
+      (fn [i coordinate] [pentagon-plane i 0.5 coordinate (* i 
+                                                                (* 72 (/ pi 180)))]) 
+      @pentagon-points)]))
    
   
   
@@ -138,19 +125,18 @@
           texture (useTexture "/images/logo.webp")
           copied-scene (react/useMemo (fn [] (.clone scene))
                                       #js [scene])]
-      (.log js/console object)
+      
       [:> (.-mesh animated) {:rotation [0 0 0]
                              :position [0 -3 0]
                              :scale [0.01 0.01 0.01]}
                               
-       [:primitive {:object copied-scene
-                    :scale 20 
+       [:primitive {:scale 20 
                     
                     :receiveShadow true}]])))
 
 (defn lights []
   (let [directional-light-ref (react/useRef)]
-    (useHelper directional-light-ref PointLightHelper)
+    ;(useHelper directional-light-ref PointLightHelper)
     [:group
      [:pointLight {:ref directional-light-ref
                    :intensity 0.7
@@ -176,12 +162,13 @@
                         :far 1000
                         :position [0 0.8 0.6]}} 
     [:> OrbitControls]
-    [:> GizmoHelper 
-     {:alignment "bottom-right"}
-     [:> GizmoViewport]]
+    ;; [:> GizmoHelper 
+    ;;  {:alignment "bottom-right"}
+    ;;  [:> GizmoViewport]]
+    ;[:> Grid]
     [:> Sky] 
     [lights] 
     [deck/decks]
-    [mountains]
-    [:> Grid]
-    [pentagon 0.5]]])
+    ;[mountains]
+    
+    [pentagon ]]])
