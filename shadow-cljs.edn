@@ -1,0 +1,37 @@
+
+{:source-paths ["source-code"]
+ :dependencies [[cider/cider-nrepl "0.49.0"]
+                [binaryage/devtools "1.0.7"]
+                [venantius/accountant  "0.2.5"]
+                [pez/clerk             "1.0.0"]
+                [re-frame/re-frame     "1.4.3"]
+                [cljs-ajax/cljs-ajax   "0.8.4"]
+                [clj-commons/secretary "1.2.4"] 
+                [metosin/reitit        "0.7.0"]
+                [expound/expound       "0.9.0"]]
+        
+ :builds {:frontend {:target :browser
+                     :output-dir "resources/frontend/public/js"
+                     :modules {:core {:init-fn frontend.core/start!}}
+                     :js-options  {:js-package-dirs ["resources/frontend/node_modules"]
+                                   :js-provider :external
+                                   :external-index "resources/frontend/target/index.js"}} 
+          :frontend-ready  {:modules     {:core {:init-fn frontend.core/start!}} 
+                            :compiler-options {:optimizations :advanced} 
+                            :output-dir  "resources/frontend/public/js"
+                            :target      :browser
+                            :js-options  {:js-package-dirs ["resources/frontend/node_modules"] 
+                                          :js-provider :external
+                                          :external-index "resources/frontend/target/index.js"}}
+          :backend {:target :node-script
+                    :output-to "resources/backend/core.js" 
+                    :js-options {:js-package-dirs ["resources/backend/node_modules"]}
+                    :main backend.server/start!}
+          :backend-ready {:target :node-script
+                          :output-to "resources/backend/core.js" 
+                          :js-options {:js-package-dirs ["resources/backend/node_modules"]}
+                          :main backend.server/start!}}} 
+                          
+
+
+

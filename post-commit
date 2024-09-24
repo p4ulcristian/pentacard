@@ -1,0 +1,27 @@
+#!/bin/bash
+
+current_branch=$(git rev-parse --abbrev-ref HEAD)
+
+
+if [ "$current_branch" = "main" ]; then
+    # Temporarily disable the post-commit hook
+    mv .git/hooks/post-commit .git/hooks/post-commit.temp
+
+    # Get the latest commit message
+    latest_commit_message=$(git log -1 --pretty=format:"%s")
+
+    # Path to the version file
+    version_file="resources/backend/VERSION"
+
+    # Update the version file with the latest commit message
+    echo "$latest_commit_message" > "$version_file"
+
+    # Add the updated version file to the staging area
+    git add "$version_file"
+
+    # Commit the changes with the latest commit message
+    git commit -m "$latest_commit_message version bump"
+
+    # Re-enable the post-commit hook
+    mv .git/hooks/post-commit.temp .git/hooks/post-commit
+fi
