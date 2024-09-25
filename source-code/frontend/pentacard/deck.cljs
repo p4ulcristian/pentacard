@@ -38,20 +38,22 @@
             :position [0 0 0]}]))
 
 
-(defn callback-x [^js ref ^js spring-value callback-id]
-  (let [has-animated? (.-hasAnimated spring-value)
-        is-animating? (.-isAnimating spring-value)
-        finished?  (and has-animated? (not is-animating?))] 
-    (if-not finished?
-      (set! (-> ^js ref .-current .-position .-x) (.get spring-value))
-      (dispatch [:render/remove-callback callback-id]))))
 
-(defn callback-z [^js ref ^js spring-value]
+(defn animation-finished? [^js spring-value]
   (let [has-animated? (.-hasAnimated spring-value)
         is-animating? (.-isAnimating spring-value)
-        finished?  (and has-animated? (not is-animating?))] 
-    (when-not finished?
-      (set! (-> ^js ref .-current .-position .-z) (.get spring-value)))))
+        finished?     (and has-animated? (not is-animating?))] 
+    finished?))
+
+(defn callback-x [^js ref ^js spring-value callback-id] 
+  (if-not (animation-finished? spring-value)
+    (set! (-> ^js ref .-current .-position .-x) (.get spring-value))
+    (dispatch [:render/remove-callback callback-id])))
+
+(defn callback-z [^js ref ^js spring-value callback-id] 
+  (if-not (animation-finished? spring-value)
+    (set! (-> ^js ref .-current .-position .-z) (.get spring-value))
+    (dispatch [:render/remove-callback callback-id])))
 
 (defn animate-card [ref index from to]
   (let [from-position @(subscribe [:db/get [:positions from]])
@@ -60,13 +62,18 @@
         [to-x to-y to-z] to-position
         x-spring (new SpringValue from-x 
                       #js {:to to-x 
+                           
                            :config #js {:mass 2}}) 
-        z-spring (new SpringValue from-z
-                      #js {:to (* 0.01 index)})
-        x-callback-id (str (random-uuid))]
+        z-spring (new SpringValue 0
+                      #js {:to (* 0.01 (inc index))
+                           :delay 500
+                           :config #js {:mass 2}})
+        x-callback-id (str (random-uuid))
+        z-callback-id (str (random-uuid))]
     (println "oi index" index from)
 
-    (dispatch [:render/add-callback x-callback-id (fn [] (callback-x ref x-spring x-callback-id))])))
+    (dispatch [:render/add-callback x-callback-id (fn [] (callback-x ref x-spring x-callback-id))])
+    (dispatch [:render/add-callback z-callback-id (fn [] (callback-z ref z-spring z-callback-id))])))
     ;(dispatch [:render/remove-callback  x-callback-id])))
     ;(dispatch [:render/add-callback (fn [] (callback-z ref z-spring))])))
     ;(.requestAnimationFrame js/window #(callback-x ref x-spring))

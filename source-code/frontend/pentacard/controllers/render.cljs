@@ -3,9 +3,11 @@
             [re-frame.db :refer [app-db]]))
 
 
+
+
 (defn render-function []
   (let [functions (get-in @app-db [:render-functions])] 
-    (println "Running renders: " (count functions))
+    (println "Running renders: " (count functions) (keys functions))
     (doseq [[function-id function] functions]
       (function))
     (.requestAnimationFrame js/window render-function)))
