@@ -18,13 +18,21 @@
                                              :duration 1000
                                              ;:loop true
                                              :config #js {:mass 5}})]
-    
     (.requestAnimationFrame js/window #(callback ref spring-value))))
+
+
+(reg-event-db
+ :cards/draw!
+ (fn [db [_ id]] 
+   (assoc-in db [:cards id :origin]  :discard-deck)))
+
+
 
 (reg-event-db
  :game/start!
  (fn [db [_]]
-   (let [ref (-> db :animated-example :ref)]
-     (println "heh: " ref)
-     (animation ref)
-     (assoc-in db [:animated-example :animated?] (not (get-in db  [:animated-example :animated?]))))))
+   (let [cards (-> db :cards)
+         refs (map (fn [[card-id card-data]] (:ref card-data))
+                   (-> db :cards))
+         last-card-id (first (last cards))] 
+     (dispatch [:cards/draw! last-card-id]))))

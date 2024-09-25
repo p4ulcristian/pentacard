@@ -154,10 +154,8 @@
 
 (defn state-viewer []
   (let [data @(subscribe [:db/get []])
-        filter-vector [:animated-example]
-        filtered-data (dissoc 
-                       (get-in data filter-vector)
-                       :cards)]
+        filter-vector []
+        filtered-data (get-in data filter-vector)]
     [:pre {:style {:background :white
                    :height "200px"
                    :overflow-y :scroll}}

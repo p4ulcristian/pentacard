@@ -36,14 +36,21 @@
             :material text-material
             :position [0 0 0]}]))
 
-(defn one-card [index {:keys [rank suit suit-emoji]}]
-  (let [texture (useTexture "/images/logo.webp")]
+(defn one-card [index card]
+  (let [[card-id card-data] card
+        {:keys [rank suit suit-emoji]} card-data
+        ref (react/useRef)
+        texture (useTexture "/images/logo.webp")]
+    (react/useEffect (fn []
+                       (dispatch [:db/set [:cards card-id :ref] ref] )
+                       (fn []))
+                     #js [])
     [:group { :position [0
-                        (* 0.006 index)
-                        0]
+                         (* 0.006 index)
+                         0]
              :scale [1 1 1]
              :rotation [(- (/ (.-PI js/Math) 2)) 0 0]}
-     [:mesh {}
+     [:mesh {:ref ref}
       [:BoxGeometry {:castShadow true 
                      :receiveShadow true
                      :args [0.1 0.1 0.005]}]
@@ -56,10 +63,10 @@
      [:group
       {:position [0.02 0.04 0]}
       [render-one-letter rank]]
-    ]))
+     ]))
 
 (defn drawing-deck []
-  (let [deck (subscribe [:db/get [:drawing-deck]])]
+  (let [deck (subscribe [:db/get [:cards]])]
     [:group 
     {:position [-0.1 0 0]}
    ;;   [:> Html [:div {:style {:background :white}} 

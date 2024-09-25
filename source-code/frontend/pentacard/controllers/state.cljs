@@ -14,8 +14,14 @@
     {:rank rank
      :suit suit
      :suit-emoji (get suits-emojis suit)
-     :state :drawing-deck}))
+     :origin :drawing-deck}))
 
+(def deck-with-keys 
+  (reduce merge 
+          (map 
+           (fn [card] {(keyword (str (random-uuid)))
+                    card})
+           deck)))
 
 (defn pentagon-points
   "Calculate the coordinates of the vertices of a regular pentagon,
@@ -34,7 +40,7 @@
 
 (def state 
   {:state :state
-   :cards deck
+   :cards deck-with-keys
    :animated-example {:ref       nil
                       :animated? false}
    :boards {:pentagon   {:points (pentagon-points 0.4)}
