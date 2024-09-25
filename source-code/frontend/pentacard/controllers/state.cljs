@@ -43,9 +43,11 @@
    :cards deck-with-keys
    :animated-example {:ref       nil
                       :animated? false}
-   :boards {:pentagon   {:points (pentagon-points 0.4)}
-            :square     {:points []}
-            :triangle   {:points []}}
+   :positions {:drawing-deck [0 0 0]
+               :discard-deck [0.2 0 0 ]
+               :pentagon   {:points (pentagon-points 0.4)}
+               :square     {:points []}
+               :triangle {:points []}}
    :card-placeholders {:1 {:position [0.07  0.07 -0.02]}
                        :2 {:position [-0.07 0.07 -0.02]}
                        :3 {:position [0.07  -0.07 -0.02]}

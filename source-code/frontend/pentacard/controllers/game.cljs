@@ -3,28 +3,21 @@
             ["@react-spring/three" :refer [SpringValue]]))
 
 
-(defn callback [^js ref ^js spring-value]
-  (let [has-animated? (.-hasAnimated spring-value)
-        is-animating? (.-isAnimating spring-value)
-        finished?  (and has-animated? (not is-animating?))]
-    (println "heey:")
-    (when-not finished? 
-      (set! (-> ^js ref .-current .-position .-x) (.get spring-value))
-      (.requestAnimationFrame js/window #(callback ref spring-value)))))
-
-(defn animation [ref]
-  (let [spring-value (new SpringValue 0 #js {:to 0.3
-                                             :delay 500
-                                             :duration 1000
-                                             ;:loop true
-                                             :config #js {:mass 5}})]
-    (.requestAnimationFrame js/window #(callback ref spring-value))))
-
+(defn filter-origin [cards filter-value]
+  (filter
+   (fn [[card-id {:keys [origin]}]]
+     (= filter-value origin))
+   cards))
 
 (reg-event-db
  :cards/draw!
  (fn [db [_ id]] 
-   (assoc-in db [:cards id :origin]  :discard-deck)))
+   (let [cards         (-> db :cards)
+         discard-deck  (filter-origin cards :discard-deck)
+         next-index    (count discard-deck)]
+     (-> db 
+         (assoc-in [:cards id :origin]  :discard-deck)
+         (assoc-in [:cards id :index]   next-index)))))
 
 
 
@@ -32,7 +25,11 @@
  :game/start!
  (fn [db [_]]
    (let [cards (-> db :cards)
-         refs (map (fn [[card-id card-data]] (:ref card-data))
-                   (-> db :cards))
-         last-card-id (first (last cards))] 
-     (dispatch [:cards/draw! last-card-id]))))
+         drawing-deck (filter 
+                       (fn [[card-id {:keys [origin]}]]
+                         (= :drawing-deck origin))
+                       cards)] 
+     (when-not 
+      (empty? drawing-deck)
+       (let [last-card-id (first (last drawing-deck))]
+         (dispatch [:cards/draw! last-card-id]))))))

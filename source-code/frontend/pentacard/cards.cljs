@@ -122,10 +122,7 @@
        (dispatch [:db/set [:animated-example :ref] ref])
        (fn []))
      #js [])
-    [:group
-     [:> Html [:button
-               {:on-click #(dispatch [:game/start!])}
-               "Anim 1" (str @animated? )]]
+    [:group 
      [:mesh {:ref ref}
       [:> Box {:args [0.1 0.1 0.1]
                :castShadow true 

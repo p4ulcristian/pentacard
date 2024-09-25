@@ -156,13 +156,16 @@
   (let [data @(subscribe [:db/get []])
         filter-vector []
         filtered-data (get-in data filter-vector)]
-    [:pre {:style {:background :white
-                   :height "200px"
-                   :overflow-y :scroll}}
-     (starter-kit/pretty-print-string 
-      filtered-data)])
+    [:div
+     [:button {:on-click #(dispatch [:game/start!])}
+      "Draw card"]
+     [:pre {:style {:background :white
+                    :height "200px"
+                    :overflow-y :scroll}}
+      (starter-kit/pretty-print-string 
+       filtered-data)]]))
    
-  )
+  
 
 (defn view [] 
   [:div
@@ -183,4 +186,4 @@
     [deck/decks]
     ;[mountains]
     
-    [pentagon ]]])
+    [pentagon]]])

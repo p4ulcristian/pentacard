@@ -13,7 +13,8 @@
                                 GizmoHelper
                                 Text Text3D]] 
    ["three/addons/loaders/FontLoader.js" :refer [FontLoader]]
-   ["three/addons/geometries/TextGeometry.js" :refer [TextGeometry]]))
+   ["three/addons/geometries/TextGeometry.js" :refer [TextGeometry]]
+   ["@react-spring/three" :refer [SpringValue]]))
 
 
 (defn render-one-letter [letter]
@@ -36,20 +37,53 @@
             :material text-material
             :position [0 0 0]}]))
 
-(defn one-card [index card]
+
+(defn callback-x [^js ref ^js spring-value]
+  (let [has-animated? (.-hasAnimated spring-value)
+        is-animating? (.-isAnimating spring-value)
+        finished?  (and has-animated? (not is-animating?))] 
+    (when-not finished?
+      (set! (-> ^js ref .-current .-position .-x) (.get spring-value))
+      (.requestAnimationFrame js/window #(callback-x ref spring-value)))))
+
+(defn callback-z [^js ref ^js spring-value]
+  (let [has-animated? (.-hasAnimated spring-value)
+        is-animating? (.-isAnimating spring-value)
+        finished?  (and has-animated? (not is-animating?))] 
+    (when-not finished?
+      (set! (-> ^js ref .-current .-position .-z) (.get spring-value))
+      (.requestAnimationFrame js/window #(callback-z ref spring-value)))))
+
+(defn animate-card [ref index from to]
+  (let [from-position @(subscribe [:db/get [:positions from]])
+        to-position   @(subscribe [:db/get [:positions to]])
+        [from-x from-y from-z] from-position
+        [to-x to-y to-z] to-position
+        x-spring (new SpringValue from-x 
+                      #js {:to to-x 
+                           :config #js {:mass 2}}) 
+        z-spring (new SpringValue from-z
+                      #js {:to (* 0.01 index)})]
+    (println from-position)
+    (.requestAnimationFrame js/window #(callback-x ref x-spring))
+    (.requestAnimationFrame js/window #(callback-z ref z-spring))))
+
+(defn one-card [i card]
   (let [[card-id card-data] card
-        {:keys [rank suit suit-emoji]} card-data
+        {:keys [rank suit suit-emoji origin ref index]} card-data
         ref (react/useRef)
-        texture (useTexture "/images/logo.webp")]
+        texture (useTexture "/images/logo.webp")
+        [old-origin set-old-origin] (react/useState origin)]
     (react/useEffect (fn []
-                       (dispatch [:db/set [:cards card-id :ref] ref] )
+                       (dispatch [:db/set [:cards card-id :ref] ref])
                        (fn []))
                      #js [])
-    [:group { :position [0
-                         (* 0.006 index)
-                         0]
-             :scale [1 1 1]
-             :rotation [(- (/ (.-PI js/Math) 2)) 0 0]}
+    (react/useEffect (fn []
+                       (when (not= old-origin origin) 
+                         (animate-card ref index old-origin origin))
+                       (fn []))
+                     #js [origin]) 
+    [:group {:rotation [(- (/ (.-PI js/Math) 2)) 0 0]}
      [:mesh {:ref ref}
       [:BoxGeometry {:castShadow true 
                      :receiveShadow true
@@ -62,38 +96,13 @@
       [render-one-letter suit-emoji]]
      [:group
       {:position [0.02 0.04 0]}
-      [render-one-letter rank]]
-     ]))
-
-(defn drawing-deck []
-  (let [deck (subscribe [:db/get [:cards]])]
-    [:group 
-    {:position [-0.1 0 0]}
-   ;;   [:> Html [:div {:style {:background :white}} 
-   ;;             (str @deck)]]
-     (map-indexed 
-      (fn [i a] [one-card i a])
-      @deck)]))
-
-
-
-(defn discard-deck []
-  (let [deck (subscribe [:db/get [:drawing-deck]])
-        ref (react/useRef)]
-    (react/useEffect 
-     (fn []
-       (dispatch [:db/set [:objects :discard-deck :ref] ref])
-       (fn [] (dispatch [:db/unset [:objects :discard-deck]]))))
-    [:group 
-     {:position [0.1 0 0]
-      :ref ref}]))
-   ;;   [:> Html [:div {:style {:background :white}} 
-   ;;             (str @deck)]]
-   ;;   (map-indexed
-   ;;    (fn [i a] [one-card i a])
-   ;;    @deck)]))
+      [render-one-letter rank]]]))
+     
 
 (defn decks []
-  [:group
-   [drawing-deck]
-   [discard-deck]])
+  (let [deck (subscribe [:db/get [:cards]])]
+    [:group
+     (map-indexed 
+      (fn [i a] ^{:key i}[one-card i a])
+      @deck)]))
+
