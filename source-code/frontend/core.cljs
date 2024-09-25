@@ -1,6 +1,6 @@
 (ns frontend.core
   (:require [frontend.router :as router]
-            [re-frame.core :refer [dispatch]]
+            [re-frame.alpha :refer [dispatch]]
             [reagent.core :as reagent]
             [reagent.dom  :as reagent-dom] 
             [reagent.dom.client :as reagent-dom-client]

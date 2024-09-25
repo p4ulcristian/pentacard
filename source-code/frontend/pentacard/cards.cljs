@@ -2,7 +2,7 @@
   (:require 
    ["@react-three/fiber" :refer [useLoader Canvas useFrame useLoader]]
    ["react" :as react] 
-   [re-frame.core :refer [subscribe dispatch]]
+   [re-frame.alpha :refer [subscribe dispatch]]
    ["@react-three/drei" :refer [Box Plane Grid]]
    ["@react-three/drei" :refer [useGLTF Sky Environment PerspectiveCamera Html RoundedBox Box, OrbitControls
                                 useBoundingBox

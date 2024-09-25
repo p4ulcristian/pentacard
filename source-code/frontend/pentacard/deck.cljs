@@ -2,7 +2,7 @@
   (:require
    ["@react-three/fiber" :refer [useLoader Canvas useFrame useLoader]]
    ["react" :as react]
-   [re-frame.core :refer [subscribe dispatch]] 
+   [re-frame.alpha :refer [subscribe dispatch]] 
    ["three" :as THREE :refer [DoubleSide]]
    ["@react-three/drei" :refer [Box Plane Grid]]
    ["@react-three/drei" :refer [useGLTF Sky Environment PerspectiveCamera Html RoundedBox Box, OrbitControls
@@ -50,6 +50,11 @@
     (set! (-> ^js ref .-current .-position .-x) (.get spring-value))
     (dispatch [:render/remove-callback callback-id])))
 
+(defn callback-y [^js ref ^js spring-value callback-id]
+  (if-not (animation-finished? spring-value)
+    (set! (-> ^js ref .-current .-position .-y) (.get spring-value))
+    (dispatch [:render/remove-callback callback-id])))
+
 (defn callback-z [^js ref ^js spring-value callback-id] 
   (if-not (animation-finished? spring-value)
     (set! (-> ^js ref .-current .-position .-z) (.get spring-value))
@@ -60,14 +65,29 @@
     (set! (-> ^js ref .-current .-rotation .-y) (.get spring-value))
     (dispatch [:render/remove-callback callback-id])))
 
+
+(defn get-position [the-key]
+  (let [board?    (clojure.string/starts-with? (str the-key) ":board")
+        position  @(subscribe [:db/get [:positions the-key]])
+        pentagon-points  @(subscribe [:db/get [:positions :pentagon :points]])
+        new-pos (if board?
+                  (get pentagon-points (rand-int 5))
+                  position)] 
+    new-pos))
+    
+
+
 (defn animate-card [ref index from to]
-  (let [from-position @(subscribe [:db/get [:positions from]])
-        to-position   @(subscribe [:db/get [:positions to]])
+  (let [from-position (get-position from)
+        to-position   (get-position to)
         [from-x from-y from-z] from-position
         [to-x to-y to-z] to-position
         x-spring (new SpringValue from-x 
                       #js {:to to-x 
                            
+                           :config #js {:mass 2}}) 
+        y-spring (new SpringValue from-y
+                      #js {:to to-y 
                            :config #js {:mass 2}}) 
         z-spring (new SpringValue 0
                       #js {:to (* 0.01 (inc index))
@@ -78,13 +98,17 @@
                                    :delay 500
                                    :config #js {:mass 2}})
         x-callback-id (str (random-uuid))
+        y-callback-id (str (random-uuid))
         z-callback-id (str (random-uuid))
         ry-callback-id (str (random-uuid))]
-    (println "oi index" index from)
+    (println "oi index" index from to from-x to-x)
+    (println "oi index" index from to from-y to-y)
+    (println "oi index" index from to from-z to-z)
 
-    (dispatch [:render/add-callback x-callback-id (fn [] (callback-x ref x-spring x-callback-id))])
-    (dispatch [:render/add-callback z-callback-id (fn [] (callback-z ref z-spring z-callback-id))])
-    (dispatch [:render/add-callback ry-callback-id (fn [] (callback-ry ref ry-spring ry-callback-id))])))
+    (dispatch [:render/add-callback x-callback-id (fn [] (callback-x ref x-spring x-callback-id))])))
+    ;(dispatch [:render/add-callback y-callback-id (fn [] (callback-y ref y-spring y-callback-id))])
+    ;(dispatch [:render/add-callback z-callback-id (fn [] (callback-z ref z-spring z-callback-id))])
+    ;(dispatch [:render/add-callback ry-callback-id (fn [] (callback-ry ref ry-spring ry-callback-id))])))
     ;(dispatch [:render/remove-callback  x-callback-id])))
     ;(dispatch [:render/add-callback (fn [] (callback-z ref z-spring))])))
     ;(.requestAnimationFrame js/window #(callback-x ref x-spring))
@@ -107,7 +131,7 @@
         texture (useTexture "/images/logo.webp")
         [old-origin set-old-origin] (react/useState origin)]
     (react/useEffect (fn []
-                       (first-setup ref origin)
+                       ;(first-setup ref origin)
                        (dispatch [:db/set [:cards card-id :ref] ref])
                        (fn []))
                      #js [])

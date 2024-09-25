@@ -1,5 +1,5 @@
 (ns frontend.pentacard.controllers.state
-  (:require [re-frame.core :refer [reg-event-db dispatch]]))
+  (:require [re-frame.alpha :refer [reg-flow reg-event-db dispatch]]))
 
 (def suits ["Hearts" "Diamonds"]) ;"Clubs" "Spades"])
 (def suits-emojis {"Hearts"   "\u2665"
@@ -23,6 +23,13 @@
                              (assoc card :index index)})
            deck)))
 
+(reg-flow
+ {:id     :all-cards
+  :inputs {:cards [:cards]}
+  :output (fn [{:keys [cards]}] (map str cards))
+  :path   [:cards2]})
+
+
 (defn pentagon-points
   "Calculate the coordinates of the vertices of a regular pentagon,
    relative to the center of the pentagon.
@@ -32,19 +39,19 @@
   (let [n 5
         angle-increment  (/ (* 2 Math/PI) n)
         radius           (/ side-length (* 2 (Math/sin (/ Math/PI n))))]
-    (for [i (range n)]
-      (let [angle (- (* i angle-increment) (/ Math/PI 2)) ; rotate to align first point vertically
-            x (* radius (Math/cos angle))
-            z (* radius (Math/sin angle))]
-        [x 0 z]))))
+    (vec (for [i (range n)]
+           (let [angle (- (* i angle-increment) (/ Math/PI 2)) ; rotate to align first point vertically
+                 x (* radius (Math/cos angle))
+                 z (* radius (Math/sin angle))]
+             [x 0 z])))))
 
 (def state 
   {:state :state
    :cards deck-with-keys
    :animated-example {:ref       nil
                       :animated? false}
-   :positions {:drawing-deck [-0.1 0 0]
-               :discard-deck [0.1  0 0]
+   :positions {:drawing-deck [-0.1 -0.001 -0.001]
+               :discard-deck [0.1  -0.001 -0.001]
                :pentagon   {:points (pentagon-points 0.4)}
                :square     {:points []}
                :triangle {:points []}}

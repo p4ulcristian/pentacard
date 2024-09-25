@@ -1,5 +1,5 @@
 (ns frontend.starter-kit.subscriptions.db
-  (:require [re-frame.core :refer [reg-sub]]))
+  (:require [re-frame.alpha :refer [reg-sub]]))
 
 (reg-sub
  :db/get

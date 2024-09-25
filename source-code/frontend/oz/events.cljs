@@ -1,6 +1,6 @@
 (ns frontend.oz.events
   (:require 
-   [re-frame.core :refer [reg-event-db reg-sub  dispatch]]
+   [re-frame.alpha :refer [reg-event-db reg-sub  dispatch]]
    [ajax.core :refer [GET]]
    [cljs.reader :as cljs.reader])) 
 

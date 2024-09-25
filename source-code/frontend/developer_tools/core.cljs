@@ -3,7 +3,7 @@
             [clojure.string :as clojure-string]
             [frontend.wizard.ui.style :as style]
             [frontend.wizard.utils.common :as utils]
-            [re-frame.core :refer [dispatch subscribe]]
+            [re-frame.alpha :refer [dispatch subscribe]]
             [reagent.core :as r]))
 
 

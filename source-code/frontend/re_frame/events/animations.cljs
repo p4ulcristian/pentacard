@@ -1,6 +1,6 @@
 (ns frontend.re-frame.events.animations
   (:require
-   [re-frame.core :refer [dispatch reg-event-fx reg-sub reg-fx]] 
+   [re-frame.alpha :refer [dispatch reg-event-fx reg-sub reg-fx]] 
    [my-re-frame :refer [reg-event-db]]))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;

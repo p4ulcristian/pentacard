@@ -7,7 +7,7 @@
             [frontend.starter-kit.events.api]
             [frontend.starter-kit.subscriptions.api]
             [my-re-frame :refer [reg-event-db]]
-            [re-frame.core :refer [dispatch subscribe]]
+            [re-frame.alpha :refer [dispatch subscribe]]
             [reagent.core :as reagent]
             [reitit.frontend :as reitit]))
 

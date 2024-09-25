@@ -3,7 +3,7 @@
    [frontend.wizard.utils.areas :as areas] 
    [frontend.wizard.utils.nodes :as nodes]
    [frontend.wizard.utils.common :as wizard-utils]
-   [re-frame.core :refer [dispatch]]))
+   [re-frame.alpha :refer [dispatch]]))
 
 ;;; helpers 
 

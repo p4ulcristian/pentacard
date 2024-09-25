@@ -1,5 +1,5 @@
 (ns my-re-frame
-  (:require [re-frame.core :as re-frame.core
+  (:require [re-frame.alpha :as re-frame.alpha
              :refer [->interceptor console get-coeffect]]))
 
 (def excluded-list [:browser/set-pointer!
@@ -57,9 +57,9 @@
 
 (defn reg-event-db          ;; alternative to reg-event-db
   ([id handler-fn]
-   (re-frame.core/reg-event-db id standard-interceptors handler-fn))
+   (re-frame.alpha/reg-event-db id standard-interceptors handler-fn))
   ([id interceptors handler-fn]
-   (re-frame.core/reg-event-db
+   (re-frame.alpha/reg-event-db
     id
     [standard-interceptors interceptors]
     handler-fn)))

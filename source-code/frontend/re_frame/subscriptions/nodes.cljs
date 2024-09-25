@@ -1,5 +1,5 @@
 (ns frontend.re-frame.subscriptions.nodes
-  (:require [re-frame.core :refer [reg-sub]]
+  (:require [re-frame.alpha :refer [reg-sub]]
             [frontend.wizard.utils.areas :as area-utils]
             [frontend.wizard.utils.nodes :as node-utils]))
 

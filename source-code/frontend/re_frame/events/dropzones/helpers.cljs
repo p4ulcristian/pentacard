@@ -3,7 +3,7 @@
             [frontend.wizard.utils.areas :as areas]
             [frontend.wizard.utils.common :as wizard-utils]
             [frontend.wizard.utils.nodes :as nodes]
-            [re-frame.core :refer [subscribe]]))
+            [re-frame.alpha :refer [subscribe]]))
 
 
 (defn set-new-overlay-config [db {:keys [impossible-config? overlapped-paths area dragged-path]}]

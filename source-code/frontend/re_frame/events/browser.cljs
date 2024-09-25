@@ -1,6 +1,6 @@
 (ns frontend.re-frame.events.browser
   (:require 
-   [re-frame.core :refer [reg-sub]]
+   [re-frame.alpha :refer [reg-sub]]
    [my-re-frame :refer [reg-event-db]]
    ["scroll-lock" :refer [disablePageScroll enablePageScroll]]))
  

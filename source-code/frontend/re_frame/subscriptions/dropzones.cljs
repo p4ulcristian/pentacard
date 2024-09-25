@@ -1,5 +1,5 @@
 (ns frontend.re-frame.subscriptions.dropzones
-   (:require [re-frame.core :refer [reg-sub]]))
+   (:require [re-frame.alpha :refer [reg-sub]]))
              
 
 

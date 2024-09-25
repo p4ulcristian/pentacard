@@ -24,7 +24,7 @@
             ["three/addons/loaders/GLTFLoader.js" :refer [GLTFLoader]]
             ["three/src/loaders/TextureLoader.js" :refer [TextureLoader]]
            ; ["three/examples/jsm/utils/BufferGeometryUtils.js" :refer [BufferGeometryUtils]]
-            [re-frame.core :refer [dispatch subscribe]] 
+            [re-frame.alpha :refer [dispatch subscribe]] 
             [reagent.core :as r]))
 
 
@@ -158,6 +158,8 @@
     [:div
      [:button {:on-click #(dispatch [:game/draw!])}
       "Draw card"]
+     [:button {:on-click #(dispatch [:game/start!])}
+      "Start game"]
      [:button {:on-click #(dispatch [:game/discard!])}
       "Discard card"]
      ;[:div (str "ekjadhsj" @(subscribe [:area :garage]))]
