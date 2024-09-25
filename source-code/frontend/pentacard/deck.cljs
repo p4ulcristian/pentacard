@@ -132,7 +132,7 @@
         [old-origin set-old-origin] (react/useState origin)]
     (react/useEffect (fn []
                        ;(first-setup ref origin)
-                       (dispatch [:db/set [:cards card-id :ref] ref])
+                       (dispatch [:db/set [:cards :all-cards card-id :ref] ref])
                        (fn []))
                      #js [])
     (react/useEffect (fn []
@@ -158,7 +158,7 @@
      
 
 (defn cards []
-  (let [deck (subscribe [:db/get [:cards]])]
+  (let [deck (subscribe [:db/get [:cards :all-cards]])]
     [:group
      (map
       (fn [[card-id card-data]] ^{:key card-id}[one-card [card-id card-data]])

@@ -26,8 +26,8 @@
 (reg-flow
  {:id     :all-cards
   :inputs {:cards [:cards]}
-  :output (fn [{:keys [cards]}] (map str cards))
-  :path   [:cards2]})
+  :output (fn [{:keys [cards]}]  (reduce merge (map second cards)))
+  :path   [:cards :all-cards]})
 
 
 (defn pentagon-points
@@ -48,6 +48,11 @@
 (def state 
   {:state :state
    :cards deck-with-keys
+   :piles {:drawing-deck {}
+           :discard-deck {}
+           :all-cards    {}
+           :board-1      {}
+           :board-2      {}}
    :animated-example {:ref       nil
                       :animated? false}
    :positions {:drawing-deck [-0.1 -0.001 -0.001]
