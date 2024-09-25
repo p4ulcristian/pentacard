@@ -64,32 +64,44 @@
                            :config #js {:mass 2}}) 
         z-spring (new SpringValue from-z
                       #js {:to (* 0.01 index)})]
-    (println from-position)
+    (println "oi index" index from)
     (.requestAnimationFrame js/window #(callback-x ref x-spring))
     (.requestAnimationFrame js/window #(callback-z ref z-spring))))
 
-(defn one-card [i card]
+
+(defn first-setup [ref origin]
+  (set! (-> ref .-current .-position .-x) 
+        (first @(subscribe [:db/get [:positions origin]])))
+  (set! (-> ref .-current .-position .-y) 
+        (first @(subscribe [:db/get [:positions origin]])))
+  (set! (-> ref .-current .-position .-z) 
+        (first @(subscribe [:db/get [:positions origin]])))
+                       )
+
+(defn one-card [card]
   (let [[card-id card-data] card
         {:keys [rank suit suit-emoji origin ref index]} card-data
         ref (react/useRef)
         texture (useTexture "/images/logo.webp")
         [old-origin set-old-origin] (react/useState origin)]
     (react/useEffect (fn []
+                       (first-setup ref origin)
                        (dispatch [:db/set [:cards card-id :ref] ref])
                        (fn []))
                      #js [])
     (react/useEffect (fn []
                        (when (not= old-origin origin) 
-                         (animate-card ref index old-origin origin))
+                         (animate-card ref index old-origin origin)
+                         (set-old-origin origin))
                        (fn []))
                      #js [origin]) 
+    
     [:group {:rotation [(- (/ (.-PI js/Math) 2)) 0 0]}
      [:mesh {:ref ref}
       [:BoxGeometry {:castShadow true 
                      :receiveShadow true
                      :args [0.1 0.1 0.005]}]
-      [:meshPhongMaterial {:color "orange"
-                           :map texture
+      [:meshPhongMaterial {:map texture
                            :side DoubleSide}]]
      [:group 
       {:position [0 0.04 0]}
@@ -99,10 +111,10 @@
       [render-one-letter rank]]]))
      
 
-(defn decks []
+(defn cards []
   (let [deck (subscribe [:db/get [:cards]])]
     [:group
-     (map-indexed 
-      (fn [i a] ^{:key i}[one-card i a])
+     (map
+      (fn [[card-id card-data]] ^{:key card-id}[one-card [card-id card-data]])
       @deck)]))
 

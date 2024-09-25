@@ -1,12 +1,12 @@
 (ns frontend.pentacard.controllers.state
   (:require [re-frame.core :refer [reg-event-db dispatch]]))
 
-(def suits ["Hearts" "Diamonds" "Clubs" "Spades"])
+(def suits ["Hearts" "Diamonds"]) ;"Clubs" "Spades"])
 (def suits-emojis {"Hearts"   "\u2665"
                    "Diamonds" "\u2666"
                    "Clubs"    "\u2663"
                    "Spades"   "\u2660"})
-(def ranks ["Ace" "2" "3" "4" "5" "6" "7" "8" "9" "10" "Jack" "Queen" "King"])
+(def ranks ["Ace" "2"]) ;"3" "4" "5" "6" "7" "8" "9" "10" "Jack" "Queen" "King"])
 
 (def deck
   (for [suit suits
@@ -18,9 +18,9 @@
 
 (def deck-with-keys 
   (reduce merge 
-          (map 
-           (fn [card] {(keyword (str (random-uuid)))
-                    card})
+          (map-indexed
+           (fn [index card] {(keyword (str (random-uuid)))
+                             (assoc card :index index)})
            deck)))
 
 (defn pentagon-points
@@ -43,8 +43,8 @@
    :cards deck-with-keys
    :animated-example {:ref       nil
                       :animated? false}
-   :positions {:drawing-deck [0 0 0]
-               :discard-deck [0.2 0 0 ]
+   :positions {:drawing-deck [-0.1 0 0]
+               :discard-deck [0.1  0 0]
                :pentagon   {:points (pentagon-points 0.4)}
                :square     {:points []}
                :triangle {:points []}}

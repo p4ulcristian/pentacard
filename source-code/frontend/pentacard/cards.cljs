@@ -107,27 +107,6 @@
       [:meshPhongMaterial {:map texture}]]]))
 
 
-(defn animated-example-animation [ref animated?] 
-  (useFrame (fn []
-              (let [position (-> ref .-current .-position)
-                    rotation (-> ref .-current .-rotation)]
-                (aset position "x" (+ (rand-nth [-0.01 0.01])
-                                      (.-x position)))))))
-
-(defn animated-example []
-  (let [ref (react/useRef)
-        animated? (subscribe [:db/get [:animated-example]])]
-    (react/useEffect 
-     (fn []
-       (dispatch [:db/set [:animated-example :ref] ref])
-       (fn []))
-     #js [])
-    [:group 
-     [:mesh {:ref ref}
-      [:> Box {:args [0.1 0.1 0.1]
-               :castShadow true 
-               :receiveShadow true}]]]))
-
 (defn player-cards []
   (let [board-ref (react/useRef) 
         rotation [0 0 0]
@@ -142,8 +121,6 @@
    ;;           (+ (-> box-ref .-current .-rotation .-z) 0.004))))
     [:group {:rotation rotation
              :ref board-ref} 
-     [animated-example]
-     
      (comment
        (map 
         (fn [[key {:keys [position]}]] 

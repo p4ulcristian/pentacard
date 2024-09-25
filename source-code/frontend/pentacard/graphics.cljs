@@ -45,7 +45,6 @@
 
 
 (def pi (.-PI js/Math))
-(println "ghedsadsa" js/Math)
 
 
 (defn card [{:keys [x y z rotation color ^js object]}]
@@ -108,7 +107,7 @@
 ;; Usage
 
 (defn pentagon [] 
-  (let [pentagon-points (subscribe [:db/get [:boards :pentagon :points]])]
+  (let [pentagon-points (subscribe [:db/get [:positions :pentagon :points]])]
     [:group 
      {:rotation [0 pi 0]}
      (map-indexed
@@ -157,8 +156,10 @@
         filter-vector []
         filtered-data (get-in data filter-vector)]
     [:div
-     [:button {:on-click #(dispatch [:game/start!])}
+     [:button {:on-click #(dispatch [:game/draw!])}
       "Draw card"]
+     [:button {:on-click #(dispatch [:game/discard!])}
+      "Discard card"]
      [:pre {:style {:background :white
                     :height "200px"
                     :overflow-y :scroll}}
@@ -180,10 +181,10 @@
     ;; [:> GizmoHelper 
     ;;  {:alignment "bottom-right"}
     ;;  [:> GizmoViewport]]
-    ;[:> Grid]
+    [:> Grid]
     [:> Sky] 
     [lights] 
-    [deck/decks]
+    [deck/cards]
     ;[mountains]
     
     [pentagon]]])
