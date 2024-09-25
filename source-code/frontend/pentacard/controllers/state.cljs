@@ -35,6 +35,8 @@
 (def state 
   {:state :state
    :cards deck
+   :animated-example {:ref       nil
+                      :animated? false}
    :boards {:pentagon   {:points (pentagon-points 0.4)}
             :square     {:points []}
             :triangle   {:points []}}
@@ -48,14 +50,9 @@
 ;; Game starts ; kiosztani a kartyakat, elso player randomolasa, elso player lepese, kovetkezo player jobbra
 
 
-(reg-event-db 
- (fn []
-   ))
-
-
 
 
 (reg-event-db 
  :state/setup! 
- (fn [db []]
+ (fn [db []] 
    state))

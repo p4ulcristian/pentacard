@@ -10,7 +10,7 @@
                                          Text Text3D]]
             [frontend.pentacard.controllers.core]
             ["react" :as react]
-
+            [frontend.starter-kit.utils.basic :as starter-kit]
             [frontend.pentacard.cards :as cards]
             [frontend.pentacard.deck  :as deck]
             ["@react-three/drei" :refer [Box Plane Grid]]
@@ -152,9 +152,23 @@
                    :shadow-mapSize [1024 1024]}]]))
 
 
+(defn state-viewer []
+  (let [data @(subscribe [:db/get []])
+        filter-vector [:animated-example]
+        filtered-data (dissoc 
+                       (get-in data filter-vector)
+                       :cards)]
+    [:pre {:style {:background :white
+                   :height "200px"
+                   :overflow-y :scroll}}
+     (starter-kit/pretty-print-string 
+      filtered-data)])
+   
+  )
+
 (defn view [] 
   [:div
-   [:div {:style {:background :white}} (str @(subscribe [:db/get [:objects]]))]
+   [state-viewer]
    [:> Canvas {
                :camera {:dpr [1 2]
                         :fov 75 
