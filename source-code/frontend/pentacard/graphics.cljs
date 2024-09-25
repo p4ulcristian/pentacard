@@ -160,6 +160,7 @@
       "Draw card"]
      [:button {:on-click #(dispatch [:game/discard!])}
       "Discard card"]
+     ;[:div (str "ekjadhsj" @(subscribe [:area :garage]))]
      [:pre {:style {:background :white
                     :height "200px"
                     :overflow-y :scroll}}

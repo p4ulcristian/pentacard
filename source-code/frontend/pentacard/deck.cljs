@@ -38,21 +38,20 @@
             :position [0 0 0]}]))
 
 
-(defn callback-x [^js ref ^js spring-value]
+(defn callback-x [^js ref ^js spring-value callback-id]
   (let [has-animated? (.-hasAnimated spring-value)
         is-animating? (.-isAnimating spring-value)
         finished?  (and has-animated? (not is-animating?))] 
-    (when-not finished?
+    (if-not finished?
       (set! (-> ^js ref .-current .-position .-x) (.get spring-value))
-      (.requestAnimationFrame js/window #(callback-x ref spring-value)))))
+      (dispatch [:render/remove-callback callback-id]))))
 
 (defn callback-z [^js ref ^js spring-value]
   (let [has-animated? (.-hasAnimated spring-value)
         is-animating? (.-isAnimating spring-value)
         finished?  (and has-animated? (not is-animating?))] 
     (when-not finished?
-      (set! (-> ^js ref .-current .-position .-z) (.get spring-value))
-      (.requestAnimationFrame js/window #(callback-z ref spring-value)))))
+      (set! (-> ^js ref .-current .-position .-z) (.get spring-value)))))
 
 (defn animate-card [ref index from to]
   (let [from-position @(subscribe [:db/get [:positions from]])
@@ -63,20 +62,25 @@
                       #js {:to to-x 
                            :config #js {:mass 2}}) 
         z-spring (new SpringValue from-z
-                      #js {:to (* 0.01 index)})]
+                      #js {:to (* 0.01 index)})
+        x-callback-id (str (random-uuid))]
     (println "oi index" index from)
-    (.requestAnimationFrame js/window #(callback-x ref x-spring))
-    (.requestAnimationFrame js/window #(callback-z ref z-spring))))
+
+    (dispatch [:render/add-callback x-callback-id (fn [] (callback-x ref x-spring x-callback-id))])))
+    ;(dispatch [:render/remove-callback  x-callback-id])))
+    ;(dispatch [:render/add-callback (fn [] (callback-z ref z-spring))])))
+    ;(.requestAnimationFrame js/window #(callback-x ref x-spring))
+    ;(.requestAnimationFrame js/window #(callback-z ref z-spring))))
 
 
 (defn first-setup [ref origin]
   (set! (-> ref .-current .-position .-x) 
         (first @(subscribe [:db/get [:positions origin]])))
   (set! (-> ref .-current .-position .-y) 
-        (first @(subscribe [:db/get [:positions origin]])))
+        (second @(subscribe [:db/get [:positions origin]])))
   (set! (-> ref .-current .-position .-z) 
-        (first @(subscribe [:db/get [:positions origin]])))
-                       )
+        (nth @(subscribe [:db/get [:positions origin]]) 2)))
+                       
 
 (defn one-card [card]
   (let [[card-id card-data] card
