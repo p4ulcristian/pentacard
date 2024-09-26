@@ -101,12 +101,11 @@
         y-callback-id (str (random-uuid))
         z-callback-id (str (random-uuid))
         ry-callback-id (str (random-uuid))]
-    (println "oi index" index from to from-x to-x)
-    (println "oi index" index from to from-y to-y)
-    (println "oi index" index from to from-z to-z)
+    (println "from" index from-x from-y) 
+    (println "to" index to-x to-y to) 
 
-    (dispatch [:render/add-callback x-callback-id (fn [] (callback-x ref x-spring x-callback-id))])))
-    ;(dispatch [:render/add-callback y-callback-id (fn [] (callback-y ref y-spring y-callback-id))])
+    (dispatch [:render/add-callback x-callback-id (fn [] (callback-x ref x-spring x-callback-id))])
+    (dispatch [:render/add-callback y-callback-id (fn [] (callback-y ref y-spring y-callback-id))])))
     ;(dispatch [:render/add-callback z-callback-id (fn [] (callback-z ref z-spring z-callback-id))])
     ;(dispatch [:render/add-callback ry-callback-id (fn [] (callback-ry ref ry-spring ry-callback-id))])))
     ;(dispatch [:render/remove-callback  x-callback-id])))
@@ -132,7 +131,7 @@
         [old-origin set-old-origin] (react/useState origin)]
     (react/useEffect (fn []
                        ;(first-setup ref origin)
-                       (dispatch [:db/set [:cards :all-cards card-id :ref] ref])
+                       (dispatch [:db/set [:cards card-id :ref] ref])
                        (fn []))
                      #js [])
     (react/useEffect (fn []
@@ -142,7 +141,7 @@
                        (fn []))
                      #js [origin]) 
     
-    [:group {:rotation [(- (/ (.-PI js/Math) 2)) 0 0]}
+    [:group {:rotation [0 0 0]}
      [:mesh {:ref ref}
       [:BoxGeometry {:castShadow true 
                      :receiveShadow true
@@ -158,7 +157,7 @@
      
 
 (defn cards []
-  (let [deck (subscribe [:db/get [:cards :all-cards]])]
+  (let [deck (subscribe [:db/get [:cards]])]
     [:group
      (map
       (fn [[card-id card-data]] ^{:key card-id}[one-card [card-id card-data]])

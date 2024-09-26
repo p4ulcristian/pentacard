@@ -44,42 +44,6 @@
 
 
 
-(def pi (.-PI js/Math))
-
-
-(defn card [{:keys [x y z rotation color ^js object]}]
-  (let [scene (.-scene object)
-        [clicked? set-clicked?] (react/useState false)
-        spring-obj (useSpring #js {:scale (if clicked? 2 1)})
-        scale (.-scale spring-obj)
-        
-        copied-scene (react/useMemo (fn [] (.clone scene)) 
-                                    #js [scene])] 
-    [:> (.-mesh animated) {:rotation [0 0 rotation]
-                           :position [x y (if clicked? -100 z)]
-                           :scale scale
-                           :onPointerDown (fn [e] 
-                                            (.stopPropagation e)
-                                            (.log js/console "hello card: " x)
-                                            (set-clicked? true))
-                           :onPointerUp (fn [] (set-clicked? false))} 
-     [:group {:position [-15 -27 0]}
-      [:mesh 
-       [:BoxGeometry {:args [10 10 10]}]
-       [:meshBasicMaterial {:color color}]]
-      [render-one-letter "A"]]
-                     
-     [:primitive {:object copied-scene
-                  :scale 20
-                  
-                  :receiveShadow true}]]))
-
-            
-
-    
-
-
-
 (defn side-length-from-radius
   "Calculate the side length of a regular pentagon given its radius."
   [radius]
@@ -93,10 +57,10 @@
    [:meshPhongMaterial {:color color
                         :side DoubleSide}]])
 
-(defn pentagon-plane [index radius position rotation]
+(defn pentagon-plane  [index radius position rotation]
   (let [side-length (side-length-from-radius radius)]
     [:group {:position position
-             :rotation [(/ pi 2) 0 rotation]} 
+             :rotation [0 0 rotation]} 
      [player-board "lightgreen"] 
      [:> Html index]
      [cards/player-cards position]]))
@@ -109,10 +73,10 @@
 (defn pentagon [] 
   (let [pentagon-points (subscribe [:db/get [:positions :pentagon :points]])]
     [:group 
-     {:rotation [0 pi 0]}
+     {:rotation [0 (.-PI js/Math) 0]}
      (map-indexed
       (fn [i coordinate] [pentagon-plane i 0.5 coordinate (* i 
-                                                                (* 72 (/ pi 180)))]) 
+                                                                (* 72 (/ (.-PI js/Math) 180)))]) 
       @pentagon-points)]))
    
   
@@ -141,13 +105,13 @@
                    :intensity 0.7
                    :color "#fff"
                    :castShadow true
-                   :position [0 0.5 0]
+                   :position  [0 0 -0.6]
                    :shadow-mapSize [1024 1024]}]
      [:pointLight {:ref directional-light-ref
                    :intensity 1
                    :color "#fff"
                    :castShadow true
-                   :position [0 -0.3 0]
+                   :position  [0 0 -0.6]
                    :shadow-mapSize [1024 1024]}]]))
 
 
@@ -155,7 +119,9 @@
   (let [data @(subscribe [:db/get []])
         filter-vector []
         filtered-data (get-in data filter-vector)]
-    [:div
+    [:div {:style {:opacity 0.3
+                   :position :fixed 
+                   :z-index 1000}}
      [:button {:on-click #(dispatch [:game/draw!])}
       "Draw card"]
      [:button {:on-click #(dispatch [:game/start!])}
@@ -179,7 +145,7 @@
                         :fov 75 
                         :near 0.1 
                         :far 1000
-                        :position [0 0.8 0.6]}} 
+                        :position [0 -0.1 -1]}} 
     [:> OrbitControls]
     ;; [:> GizmoHelper 
     ;;  {:alignment "bottom-right"}

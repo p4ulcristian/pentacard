@@ -1,12 +1,12 @@
 (ns frontend.pentacard.controllers.state
   (:require [re-frame.alpha :refer [reg-flow reg-event-db dispatch]]))
 
-(def suits ["Hearts" "Diamonds"]) ;"Clubs" "Spades"])
+(def suits ["Hearts" "Diamonds" "Clubs" "Spades"])
 (def suits-emojis {"Hearts"   "\u2665"
                    "Diamonds" "\u2666"
                    "Clubs"    "\u2663"
                    "Spades"   "\u2660"})
-(def ranks ["Ace" "2"]) ;"3" "4" "5" "6" "7" "8" "9" "10" "Jack" "Queen" "King"])
+(def ranks ["Ace" "2" "3" "4" "5" "6" "7" "8" "9" "10" "Jack" "Queen" "King"])
 
 (def deck
   (for [suit suits
@@ -42,8 +42,8 @@
     (vec (for [i (range n)]
            (let [angle (- (* i angle-increment) (/ Math/PI 2)) ; rotate to align first point vertically
                  x (* radius (Math/cos angle))
-                 z (* radius (Math/sin angle))]
-             [x 0 z])))))
+                 y (* radius (Math/sin angle))]
+             [x y 0])))))
 
 (def state 
   {:state :state
