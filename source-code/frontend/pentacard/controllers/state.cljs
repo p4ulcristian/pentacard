@@ -16,6 +16,7 @@
      :suit-emoji (get suits-emojis suit)
      :origin :drawing-deck}))
 
+
 (def deck-with-keys 
   (reduce merge 
           (map-indexed
@@ -23,11 +24,11 @@
                              (assoc card :index index)})
            deck)))
 
-(reg-flow
- {:id     :all-cards
-  :inputs {:cards [:cards]}
-  :output (fn [{:keys [cards]}]  (reduce merge (map second cards)))
-  :path   [:cards :all-cards]})
+;; (reg-flow
+;;  {:id     :all-cards
+;;   :inputs {:cards [:cards]}
+;;   :output (fn [{:keys [cards]}]  (reduce merge (map second cards)))
+;;   :path   [:cards :all-cards]})
 
 
 (defn pentagon-points

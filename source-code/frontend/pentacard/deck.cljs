@@ -30,7 +30,7 @@
                                                ;:bevelSize 0.2
                                                ;:bevelOffset 0
                                                ;:bevelSegments 1}) 
-        text-material (THREE/MeshPhongMaterial. #js {:color "#fff"})]
+        text-material (THREE/MeshPhongMaterial. #js {:color "#0F0"})]
 
     [:mesh {:ref text-ref
             :geometry text-geometry
@@ -90,24 +90,22 @@
                       #js {:to to-y 
                            :config #js {:mass 2}}) 
         z-spring (new SpringValue 0
-                      #js {:to (* 0.01 (inc index))
-                           :delay 500
+                      #js {:to (- (* 0.01 (inc index))) 
                            :config #js {:mass 2}})
         ry-spring (new SpringValue 0
-                              #js {:to (.-PI js/Math)
-                                   :delay 500
-                                   :config #js {:mass 2}})
+                       #js {:to (.-PI js/Math)
+                            :config #js {:mass 2}})
         x-callback-id (str (random-uuid))
         y-callback-id (str (random-uuid))
         z-callback-id (str (random-uuid))
         ry-callback-id (str (random-uuid))]
-    (println "from" index from-x from-y) 
-    (println "to" index to-x to-y to) 
+    (println "from" from-position)  
 
+    (dispatch [:render/add-callback ry-callback-id (fn [] (callback-ry ref ry-spring ry-callback-id))])
     (dispatch [:render/add-callback x-callback-id (fn [] (callback-x ref x-spring x-callback-id))])
-    (dispatch [:render/add-callback y-callback-id (fn [] (callback-y ref y-spring y-callback-id))])))
-    ;(dispatch [:render/add-callback z-callback-id (fn [] (callback-z ref z-spring z-callback-id))])
-    ;(dispatch [:render/add-callback ry-callback-id (fn [] (callback-ry ref ry-spring ry-callback-id))])))
+    (dispatch [:render/add-callback y-callback-id (fn [] (callback-y ref y-spring y-callback-id))])
+    (dispatch [:render/add-callback z-callback-id (fn [] (callback-z ref z-spring z-callback-id))])
+    ))
     ;(dispatch [:render/remove-callback  x-callback-id])))
     ;(dispatch [:render/add-callback (fn [] (callback-z ref z-spring))])))
     ;(.requestAnimationFrame js/window #(callback-x ref x-spring))
@@ -141,19 +139,17 @@
                        (fn []))
                      #js [origin]) 
     
-    [:group {:rotation [0 0 0]}
-     [:mesh {:ref ref}
+    [:group {:rotation [0 0 0]
+             :ref ref}
+     [:mesh 
       [:BoxGeometry {:castShadow true 
                      :receiveShadow true
                      :args [0.1 0.1 0.005]}]
       [:meshPhongMaterial {:map texture
                            :side DoubleSide}]]
      [:group 
-      {:position [0 0.04 0]}
-      [render-one-letter suit-emoji]]
-     [:group
-      {:position [0.02 0.04 0]}
-      [render-one-letter rank]]]))
+      {:position [-0.05 0.04 0]}
+      [render-one-letter (str suit-emoji " " rank)]]]))
      
 
 (defn cards []
