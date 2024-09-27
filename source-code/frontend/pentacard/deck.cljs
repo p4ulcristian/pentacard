@@ -73,7 +73,7 @@
         position  @(subscribe [:db/get [:positions the-key]])
         pentagon-points  @(subscribe [:db/get [:positions :pentagon :points]])
         new-pos (if player?
-                  (get pentagon-points (rand-int player-number))
+                  (get pentagon-points player-number)
                   position)] 
     new-pos))
     
