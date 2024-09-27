@@ -49,23 +49,12 @@
 (def state 
   {:state :state
    :cards deck-with-keys
-   :piles {:drawing-deck {}
-           :discard-deck {}
-           :all-cards    {}
-           :board-1      {}
-           :board-2      {}}
-   :animated-example {:ref       nil
-                      :animated? false}
+   :players-count 5
    :positions {:drawing-deck [-0.1 -0.001 -0.001]
                :discard-deck [0.1  -0.001 -0.001]
                :pentagon   {:points (pentagon-points 0.4)}
                :square     {:points []}
-               :triangle {:points []}}
-   :card-placeholders {:1 {:position [0.07  0.07 -0.02]}
-                       :2 {:position [-0.07 0.07 -0.02]}
-                       :3 {:position [0.07  -0.07 -0.02]}
-                       :4 {:position [-0.07 -0.07 -0.02]}
-                       :5 {:position [-0.07 -0.21 -0.02]}}})
+               :triangle {:points []}}})
 
 
 ;; Game starts ; kiosztani a kartyakat, elso player randomolasa, elso player lepese, kovetkezo player jobbra

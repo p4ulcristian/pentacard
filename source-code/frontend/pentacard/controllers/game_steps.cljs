@@ -1,7 +1,7 @@
-(ns frontend.pentacard.controllers.game
-  (:require [re-frame.alpha :refer [reg-event-db dispatch]]
-            ["@react-spring/three" :refer [SpringValue]]))
-
+(ns frontend.pentacard.controllers.game-steps
+  (:require ["@react-spring/three" :refer [SpringValue]]
+            [frontend.pentacard.controllers.game-steps.start :as start]
+            [re-frame.alpha :refer [dispatch reg-event-db]]))
 
 
 (defn re-sort-cards [cards]
@@ -76,22 +76,12 @@
 (reg-event-db
  :game/draw!
  (fn [db [_]]
-   (let [cards (-> db :cards)
-         drawing-deck  (filter-origin cards :drawing-deck)] 
-     (when-not 
-      (empty? drawing-deck)
-      (let [last-card-id (first (last drawing-deck))]
-        (dispatch [:cards/draw! last-card-id]))))))
+   (start/start db)))
 
 (reg-event-db
  :game/start!
  (fn [db [_]]
-   (let [cards (-> db :cards)
-         drawing-deck  (filter-origin cards :drawing-deck)]
-     (when-not
-      (empty? drawing-deck)
-       (let [last-card-id (first (last drawing-deck))]
-         (dispatch [:cards/start! last-card-id]))))))
+   (start/start db)))
 
 (reg-event-db
  :cards/discard!
@@ -100,7 +90,7 @@
          card-drawed   (get cards id)
          discard-deck    (dissoc (filter-origin cards :discard-deck) id)
          drawing-deck    (filter-origin cards :drawing-deck)
-         next-discard-index    (count drawing-deck)
+         next-discard-index    (count discard-deck)
          card-modified        (assoc card-drawed
                                      :origin :drawing-deck
                                      :index next-discard-index)

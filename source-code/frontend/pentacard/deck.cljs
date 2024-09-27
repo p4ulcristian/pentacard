@@ -14,7 +14,8 @@
                                 Text Text3D]] 
    ["three/addons/loaders/FontLoader.js" :refer [FontLoader]]
    ["three/addons/geometries/TextGeometry.js" :refer [TextGeometry]]
-   ["@react-spring/three" :refer [SpringValue]]))
+   ["@react-spring/three" :refer [SpringValue]]
+   ))
 
 
 (defn render-one-letter [letter]
@@ -67,11 +68,12 @@
 
 
 (defn get-position [the-key]
-  (let [board?    (clojure.string/starts-with? (str the-key) ":board")
+  (let [player?    (clojure.string/starts-with? (str the-key) ":player")
+        player-number (when player? (int (last (str the-key))))
         position  @(subscribe [:db/get [:positions the-key]])
         pentagon-points  @(subscribe [:db/get [:positions :pentagon :points]])
-        new-pos (if board?
-                  (get pentagon-points (rand-int 5))
+        new-pos (if player?
+                  (get pentagon-points (rand-int player-number))
                   position)] 
     new-pos))
     
@@ -99,7 +101,8 @@
         y-callback-id (str (random-uuid))
         z-callback-id (str (random-uuid))
         ry-callback-id (str (random-uuid))]
-    (println "from" from-position)  
+    (println "from" from from-position)  
+    (println "to" to to-position)  
 
     (dispatch [:render/add-callback ry-callback-id (fn [] (callback-ry ref ry-spring ry-callback-id))])
     (dispatch [:render/add-callback x-callback-id (fn [] (callback-x ref x-spring x-callback-id))])
@@ -149,7 +152,7 @@
                            :side DoubleSide}]]
      [:group 
       {:position [-0.05 0.04 0]}
-      [render-one-letter (str suit-emoji " " rank)]]]))
+      [render-one-letter (str index suit-emoji " " rank)]]]))
      
 
 (defn cards []
