@@ -5,13 +5,13 @@
 
 (defn deal-cards [cards-to-deal rest-of-cards players-count] 
   (merge rest-of-cards 
-         (data/re-index-with-same-order
-          (reduce merge
-                  (map-indexed
-                   (fn [index [card-id card-data]]
-                     {card-id (assoc card-data 
-                                     :origin (keyword (str "player-" (rem index players-count))))})
-                   cards-to-deal)))))
+         (reduce merge
+                 (map-indexed
+                  (fn [index [card-id card-data]]
+                    {card-id (assoc card-data 
+                                    :index  (quot index players-count)
+                                    :origin (keyword (str "player-" (rem index players-count))))})
+                  cards-to-deal))))
   
 
 (defn start [db]
