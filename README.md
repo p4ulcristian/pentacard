@@ -82,6 +82,9 @@ Animation needs a starting point and a finishing point.
 Could we make animations events too?
 
 [:animation/deal-cards 
-  {:callback-event [:events/deal-cards ]}]
+  {:callback-event [:events/deal-cards]}]
 
-  
+What about giving the animation as a side-event? 
+
+[:events/deal-cards 
+   {:side-effect [:animation/deal-cards]}]

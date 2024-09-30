@@ -8,6 +8,8 @@
                                          useHelper
                                          GizmoHelper
                                          Text Text3D]]
+            [frontend.pentacard.drawing-deck :as drawing-deck]
+            [frontend.pentacard.discard-deck :as discard-deck]
             [frontend.pentacard.controllers.core]
             ["react" :as react]
             [frontend.starter-kit.utils.basic :as starter-kit]
@@ -70,7 +72,7 @@
 
 ;; Usage
 
-(defn pentagon [] 
+(defn boards [] 
   (let [pentagon-points (subscribe [:db/get [:positions :pentagon :points]])]
     [:group 
      {:rotation [0 (.-PI js/Math) 0]}
@@ -105,13 +107,13 @@
                    :intensity 0.7
                    :color "#fff"
                    :castShadow true
-                   :position  [0 0 -0.6]
+                   :position  [0 0 0.6]
                    :shadow-mapSize [1024 1024]}]
      [:pointLight {:ref directional-light-ref
                    :intensity 1
                    :color "#fff"
                    :castShadow true
-                   :position  [0 0 -0.6]
+                   :position  [0 0 0.6]
                    :shadow-mapSize [1024 1024]}]]))
 
 
@@ -145,7 +147,7 @@
                         :fov 75 
                         :near 0.1 
                         :far 1000
-                        :position [0 -0.1 -1]}} 
+                        :position [0 -0.1 1]}} 
     [:> OrbitControls]
     ;; [:> GizmoHelper 
     ;;  {:alignment "bottom-right"}
@@ -153,7 +155,10 @@
     [:> Grid]
     [:> Sky] 
     [lights] 
-    [deck/cards]
+    
+    ;[deck/cards]
     ;[mountains]
     
-    [pentagon]]])
+    [boards]
+    [drawing-deck/view]
+    [discard-deck/view]]])
