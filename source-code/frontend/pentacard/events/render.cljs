@@ -1,4 +1,4 @@
-(ns frontend.pentacard.controllers.render
+(ns frontend.pentacard.events.render
   (:require [re-frame.alpha :refer [subscribe reg-event-db]]
             [re-frame.db :refer [app-db]]))
 

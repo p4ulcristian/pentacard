@@ -1,4 +1,4 @@
-(ns frontend.pentacard.controllers.state
+(ns frontend.pentacard.events.state
   (:require [re-frame.alpha :refer [reg-flow reg-event-db dispatch]]))
 
 (def suits ["Hearts" "Diamonds" "Clubs" "Spades"])
@@ -10,7 +10,7 @@
 
 (def deck
   (for [suit suits
-        rank ranks]
+        rank ranks] 
     {:rank rank
      :suit suit
      :suit-emoji (get suits-emojis suit)

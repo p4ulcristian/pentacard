@@ -8,9 +8,9 @@
                                          useHelper
                                          GizmoHelper
                                          Text Text3D]]
+            [frontend.pentacard.events]
             [frontend.pentacard.drawing-deck :as drawing-deck]
-            [frontend.pentacard.discard-deck :as discard-deck]
-            [frontend.pentacard.controllers.core]
+            [frontend.pentacard.discard-deck :as discard-deck] 
             ["react" :as react]
             [frontend.starter-kit.utils.basic :as starter-kit]
             [frontend.pentacard.cards :as cards]

@@ -46,7 +46,7 @@
 
 
 (defn view []
-  (let [deck (subscribe [:db/get [:drawing-deck :cards]])
+  (let [deck (subscribe [:db/get [:discard-deck :cards]])
         position [0.1 0 0]]
     [:group
      (map

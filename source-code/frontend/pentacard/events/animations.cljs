@@ -1,0 +1,1 @@
+(ns frontend.pentacard.events.animations)
