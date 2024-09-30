@@ -14,8 +14,8 @@
                                 Text Text3D]] 
    ["three/addons/loaders/FontLoader.js" :refer [FontLoader]]
    ["three/addons/geometries/TextGeometry.js" :refer [TextGeometry]]
-   ["@react-spring/three" :refer [SpringValue]]
-   ))
+   ["@react-spring/three" :refer [SpringValue]]))
+   
 
 
 (defn render-one-letter [letter]
@@ -67,13 +67,21 @@
     (dispatch [:render/remove-callback callback-id])))
 
 
+(defn is-player? [the-key]
+  (clojure.string/starts-with? (str the-key) ":player"))
+
+(defn get-player-position [the-key]
+  (let [player-number (int (last (str the-key)))
+        pentagon-points  @(subscribe [:db/get [:positions :pentagon :points]])]
+    (get pentagon-points player-number)))
+
 (defn get-position [the-key]
-  (let [player?    (clojure.string/starts-with? (str the-key) ":player")
-        player-number (when player? (int (last (str the-key))))
+  (let [player?    (is-player? the-key)
+       
         position  @(subscribe [:db/get [:positions the-key]])
-        pentagon-points  @(subscribe [:db/get [:positions :pentagon :points]])
+        
         new-pos (if player?
-                  (get pentagon-points player-number)
+                  (get-player-position the-key)
                   position)] 
     new-pos))
     
@@ -105,15 +113,20 @@
     (println "to" to to-position)  
 
     (dispatch [:render/add-callback ry-callback-id (fn [] (callback-ry ref ry-spring ry-callback-id))])
-    (dispatch [:render/add-callback x-callback-id (fn [] (callback-x ref x-spring x-callback-id))])
-    (dispatch [:render/add-callback y-callback-id (fn [] (callback-y ref y-spring y-callback-id))])
-    (dispatch [:render/add-callback z-callback-id (fn [] (callback-z ref z-spring z-callback-id))])
-    ))
+    (dispatch [:render/add-callback x-callback-id  (fn [] (callback-x ref x-spring x-callback-id))])
+    (dispatch [:render/add-callback y-callback-id  (fn [] (callback-y ref y-spring y-callback-id))])
+    (dispatch [:render/add-callback z-callback-id  (fn [] (callback-z ref z-spring z-callback-id))])))
+    
     ;(dispatch [:render/remove-callback  x-callback-id])))
     ;(dispatch [:render/add-callback (fn [] (callback-z ref z-spring))])))
     ;(.requestAnimationFrame js/window #(callback-x ref x-spring))
     ;(.requestAnimationFrame js/window #(callback-z ref z-spring))))
 
+(defn card-animations [ref index old-origin origin]
+  (cond 
+    (and (= old-origin :drawing-deck) (is-player? origin))
+    (animate-card ref index :drawing-deck origin)
+    :else :else))
 
 (defn first-setup [ref origin]
   (set! (-> ref .-current .-position .-x) 
@@ -137,7 +150,7 @@
                      #js [])
     (react/useEffect (fn []
                        (when (not= old-origin origin) 
-                         (animate-card ref index old-origin origin)
+                         (card-animations ref index old-origin origin)
                          (set-old-origin origin))
                        (fn []))
                      #js [origin]) 

@@ -47,7 +47,8 @@
              [x y 0])))))
 
 (def state 
-  {:state :state
+  {:state {:type nil 
+           :data nil}
    :cards deck-with-keys
    :players-count 5
    :positions {:drawing-deck [-0.1 -0.001 -0.001]

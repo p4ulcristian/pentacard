@@ -1,6 +1,6 @@
 (ns frontend.pentacard.core
-  (:require [frontend.pentacard.graphics :as graphics]))
+  (:require [frontend.pentacard.pentacard :as pentacard]))
   
 
 (defn core []
-  [graphics/view])
+  [pentacard/view])

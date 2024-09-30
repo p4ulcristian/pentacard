@@ -1,4 +1,4 @@
-(ns frontend.pentacard.graphics
+(ns frontend.pentacard.pentacard
   (:require ["@react-three/cannon" :refer [Physics usePlane useBox useCylinder useRaycastVehicle]]
             ["@react-three/drei" :refer [useGLTF Sky Environment PerspectiveCamera Html RoundedBox Box, OrbitControls
                                          useBoundingBox
