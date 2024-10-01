@@ -25,7 +25,11 @@
          [last-card-key last-card-value] last-card
          new-last-card    (update-card-index last-card-value discard-deck)
          new-drawing-deck (dissoc drawing-deck last-card-key)
-         new-discard-deck (assoc discard-deck last-card-key new-last-card)]
-     (-> db
-         (assoc-in [:drawing-deck :cards] new-drawing-deck)
-         (assoc-in [:discard-deck :cards] new-discard-deck)))))
+         new-discard-deck (assoc discard-deck last-card-key new-last-card)
+         new-db (-> db
+                  (assoc-in [:drawing-deck :cards] new-drawing-deck)
+                  (assoc-in [:discard-deck :cards] new-discard-deck))]
+     (dispatch [:animation/move-card! 
+                {:ref-key last-card-key
+                 :db-after-animation new-db}])
+     db)))

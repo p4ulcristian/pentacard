@@ -35,7 +35,7 @@
         {:keys [rank suit suit-emoji origin ref index]} card-data
         ref (react/useRef)]
     (react/useEffect (fn []
-                       (dispatch [:db/set [:cards card-id :ref] ref])
+                       (dispatch [:db/set [:refs card-id] ref])
                        (fn []))
                      #js [])
     [:group {:rotation [0 0 0]

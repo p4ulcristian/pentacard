@@ -15,7 +15,7 @@
 (.requestAnimationFrame js/window render-function)
 
 (reg-event-db 
- :render/add-callback
+ :render/add-callback 
  (fn [db [_ callback-id callback]] 
    (when debug? (println "added callback" callback-id callback))
    (assoc-in db [:render-functions callback-id] callback)))

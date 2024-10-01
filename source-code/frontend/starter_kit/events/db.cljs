@@ -10,6 +10,10 @@
  (fn [db [_ path value]]
    (assoc-in db path value)))
 
+(reg-event-db
+ :db/set-db
+ (fn [db [_ new-db]]
+   new-db))
 
 (defn get-parent-path [path]
   (vec (drop-last 1 path)))
