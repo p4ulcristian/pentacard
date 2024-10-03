@@ -104,7 +104,9 @@
          (aset position "y" y)
          (aset position "z" (* index 0.005)))
        (fn []))
-     #js [])
+     ;#js []
+     #js [origin]
+     )
     [:mesh
      {:ref ref}
      [:> Box {:args [0.1 0.1 0.001]
@@ -129,7 +131,7 @@
              :ref board-ref} 
      (map 
       (fn [[card-id card-data]] 
-        [card card-id card-data])
+        ^{:key card-id}[card card-id card-data])
       cards)]))
 
      
