@@ -8,14 +8,14 @@
                                          useHelper
                                          GizmoHelper
                                          Text Text3D]]
+            ["postprocessing" :refer  [KernelSize]]
+            ["@react-three/postprocessing" :refer [EffectComposer Bloom]]
             [frontend.pentacard.events]
-            [frontend.pentacard.drawing-deck :as drawing-deck]
-            [frontend.pentacard.discard-deck :as discard-deck] 
+            [frontend.pentacard.cards :as cards] 
+            [frontend.pentacard.new-method :as new-method]
             ["react" :as react]
-            [frontend.starter-kit.utils.basic :as starter-kit]
-            [frontend.pentacard.cards :as cards]
-            [frontend.pentacard.deck  :as deck]
-            ["@react-three/drei" :refer [Box Plane Grid]]
+            [frontend.starter-kit.utils.basic :as starter-kit] 
+            ["@react-three/drei" :refer [Box Plane Grid CameraShake]]
             ["@react-three/fiber" :refer [useLoader Canvas useFrame useLoader]]
             ["react" :refer [useRef Suspense useEffect useMemo]]
             ["@react-spring/three" :refer [useSpring useSpringValue, animated]]
@@ -51,6 +51,8 @@
   [radius]
   (* 2 radius (Math/sin (/ Math/PI 5))))
 
+
+
 (defn player-board [color]
   [:mesh {}
    [:planeGeometry {:castShadow true
@@ -64,8 +66,7 @@
     [:group {:position position
              :rotation [0 0 rotation]} 
      [player-board "lightgreen"] 
-     [:> Html index]
-     [cards/player-cards position]]))
+     [:> Html index]]))
 
 
 
@@ -73,12 +74,20 @@
 ;; Usage
 
 (defn boards [] 
-  (let [pentagon-points (subscribe [:db/get [:positions :pentagon :points]])]
-    [:group 
+  (let [pentagon-points (subscribe [:db/get [:positions :pentagon :points]])
+        square-points (subscribe [:db/get [:positions :square :points]])]
+    (comment
+      [:group 
+       {:rotation [0 (.-PI js/Math) 0]}
+       (map-indexed
+        (fn [i coordinate] [pentagon-plane i 0.5 coordinate (* i 
+                                                               (* 72 (/ (.-PI js/Math) 180)))]) 
+        @pentagon-points)]) 
+    [:group
      {:rotation [0 (.-PI js/Math) 0]}
      (map-indexed
-      (fn [i coordinate] [pentagon-plane i 0.5 coordinate (* i 
-                                                                (* 72 (/ (.-PI js/Math) 180)))]) 
+      (fn [i coordinate] [pentagon-plane i 0.5 coordinate (* i
+                                                             (* 72 (/ (.-PI js/Math) 180)))])
       @pentagon-points)]))
    
   
@@ -137,7 +146,19 @@
       (starter-kit/pretty-print-string 
        filtered-data)]]))
    
-  
+(defn camera-shake [] 
+  [:> CameraShake {:yawFrequency 0.2
+                   :pitchFrequency 0.2
+                   :rollFrequency 0.2}])
+
+
+(defn effects []
+  [:> EffectComposer {:multisampling 8}
+   [:> Bloom {:kernelSize 3
+              :luminanceThreshold 0
+              :luminanceSmoothing 0.02
+              :intensity 0.05}]
+   ])
 
 (defn view [] 
   [:div
@@ -155,10 +176,13 @@
     [:> Grid]
     [:> Sky] 
     [lights] 
+    [effects]
     
     ;[deck/cards]
     ;[mountains]
     
     [boards]
-    [drawing-deck/view]
-    [discard-deck/view]]])
+    [new-method/view]
+    ;[camera-shake]
+    [cards/view]
+    ]])

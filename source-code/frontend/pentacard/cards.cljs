@@ -91,26 +91,26 @@
                     (aset rotation "x" (.get rotation-x-spring))
                     (aset rotation "y" rotation-y)))))))
 
-(defn card-placeholder [board-ref position]
+(defn card [card-id card-data]
   (let [texture (useTexture "/images/logo.webp") 
+        {:keys [index]} card-data
         pos-ref (react/useRef)
         [stabbed? set-stabbed?] (react/useState false)] 
-    (appear-animation pos-ref position)
-    (card-stab-animation board-ref pos-ref position stabbed?)
     [:mesh
      {:ref pos-ref 
+      :position [0 0 (* index 0.005)]
       :onPointerDown (fn [] 
                        (set-stabbed? true))}
-     [:> Box {:args [0.1 0.1 0.01]
+     [:> Box {:args [0.1 0.1 0.001]
               :castShadow true 
               :receiveShadow true}
       [:meshPhongMaterial {:map texture}]]]))
 
 
-(defn player-cards []
+(defn view []
   (let [board-ref (react/useRef) 
         rotation [0 0 0]
-        card-placeholders @(subscribe [:db/get [:card-placeholders]])]
+        cards @(subscribe [:db/get [:cards]])]
    ;;  (useFrame
    ;;   (fn []
    ;;     (set! (-> box-ref .-current .-rotation .-x)
@@ -121,11 +121,10 @@
    ;;           (+ (-> box-ref .-current .-rotation .-z) 0.004))))
     [:group {:rotation rotation
              :ref board-ref} 
-     (comment
-       (map 
-        (fn [[key {:keys [position]}]] 
-          [card-placeholder board-ref position])
-        card-placeholders))]))
+     (map 
+      (fn [[card-id card-data]] 
+        [card card-id card-data])
+      cards)]))
 
      
      

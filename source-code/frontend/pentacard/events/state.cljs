@@ -21,7 +21,7 @@
   (reduce merge 
           (map-indexed
            (fn [index card] {(keyword (str (random-uuid)))
-                             (assoc card :index index)})
+                             (assoc card :index index :origin :drawing-deck)})
            deck)))
 
 ;; (reg-flow
@@ -49,17 +49,14 @@
 (def state 
   {:state {:type nil 
            :data nil}
-   :drawing-deck {:position [0.1 0 0]
-                  :cards deck-with-keys}
-   :discard-deck {:position [-0.1 0 0]
-                  :cards {}}
+   :cards   deck-with-keys
    :players {1 {:position [0 0 0]
                 :cards {}}}
    :players-count 5
    :positions {:drawing-deck [-0.1 -0.001 -0.001]
                :discard-deck [0.1  -0.001 -0.001]
                :pentagon   {:points (pentagon-points 0.4)}
-               :square     {:points []}
+               :square     {:points [[0.5 0.5 0] [0.5 -0.5 0] [-0.5 -0.5 0] [-0.5 0.5 0]]}
                :triangle {:points []}}})
 
 
