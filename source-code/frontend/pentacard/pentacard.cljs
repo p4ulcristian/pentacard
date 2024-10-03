@@ -131,6 +131,7 @@
         filtered-data (get-in data filter-vector)]
     [:div {:style {:opacity 0.3
                    :position :fixed 
+                   :width "100%"
                    :z-index 1000}}
      [:button {:on-click #(dispatch [:game/draw!])}
       "Draw card"]
@@ -140,7 +141,7 @@
       "Discard card"]
      ;[:div (str "ekjadhsj" @(subscribe [:area :garage]))]
      [:pre {:style {:background :white
-                    :height "200px"
+                    :height "200px" 
                     :overflow-y :scroll}}
       (starter-kit/pretty-print-string 
        filtered-data)]]))

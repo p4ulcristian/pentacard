@@ -109,8 +109,8 @@
          (aset position "y" y)
          (aset position "z" (* index 0.005)))
        (fn []))
-     ;#js []
-     #js [origin])
+     #js [])
+     ;#js [origin])
      
     [:mesh
      {:ref ref}

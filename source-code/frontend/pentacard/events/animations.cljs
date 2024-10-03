@@ -1,7 +1,8 @@
 (ns frontend.pentacard.events.animations
  (:require [re-frame.alpha :refer [reg-event-db dispatch]]
            ["@react-spring/three" :refer [SpringValue]]
-           [re-frame.db :as db]))
+           [re-frame.db :as db]
+           [frontend.pentacard.events.animations.deal-cards]))
 
 (defn animation-finished? [^js spring-value]
   (let [has-animated? (.-hasAnimated spring-value)
@@ -34,4 +35,6 @@
      
      (animate-position! ref) 
      db)))
+
+
    
