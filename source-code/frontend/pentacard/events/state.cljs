@@ -49,7 +49,7 @@
 (def state 
   {:state {:type nil 
            :data nil}
-   :cards   deck-with-keys
+   :game  {:cards deck-with-keys}
    :players {1 {:position [0 0 0]
                 :cards {}}}
    :players-count 5

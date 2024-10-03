@@ -93,14 +93,20 @@
 
 (defn card [card-id card-data]
   (let [texture (useTexture "/images/logo.webp") 
-        {:keys [index]} card-data
-        pos-ref (react/useRef)
-        [stabbed? set-stabbed?] (react/useState false)] 
+        {:keys [index origin]} card-data
+        ref (react/useRef)] 
+    (react/useEffect 
+     (fn []
+       (let [position (-> ref .-current .-position)
+             [x y z] @(subscribe [:db/get [:positions origin]])]
+         (dispatch [:db/set [:objects :cards card-id] ref])
+         (aset position "x" x)
+         (aset position "y" y)
+         (aset position "z" (* index 0.005)))
+       (fn []))
+     #js [])
     [:mesh
-     {:ref pos-ref 
-      :position [0 0 (* index 0.005)]
-      :onPointerDown (fn [] 
-                       (set-stabbed? true))}
+     {:ref ref}
      [:> Box {:args [0.1 0.1 0.001]
               :castShadow true 
               :receiveShadow true}
@@ -110,7 +116,7 @@
 (defn view []
   (let [board-ref (react/useRef) 
         rotation [0 0 0]
-        cards @(subscribe [:db/get [:cards]])]
+        cards @(subscribe [:db/get [:game :cards]])]
    ;;  (useFrame
    ;;   (fn []
    ;;     (set! (-> box-ref .-current .-rotation .-x)

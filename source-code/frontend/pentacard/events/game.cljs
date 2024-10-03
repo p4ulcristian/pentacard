@@ -2,32 +2,24 @@
   (:require [re-frame.alpha :refer [reg-event-db reg-event-fx dispatch]]))
             
 
-
-(defn get-last-index [cards]
-  (dec (count cards)))
-
 (defn get-last-card [cards]
-  (let [last-index (get-last-index cards)]  
-    (first (filter (fn [[_ card]] 
-                     (= last-index (:index card))) cards))))
+  (sort (fn [[_ card-one] [_ card-two]] 
+          (compare (:index card-one) (:index card-two)))
+        cards))
 
-
-(defn update-card-index [card discard-deck]
-  (let [new-index (count discard-deck)]
-    (assoc card :index new-index)))
+(defn filter-by-origin [cards origin]
+  (filter 
+   (fn [card]
+     (= (:origin card) origin))
+   cards))
 
 (reg-event-db
  :game/draw!
  (fn [db [_]]
-   (let [drawing-deck (get-in db [:drawing-deck :cards])
-         discard-deck (get-in db [:discard-deck :cards])
-         last-card (get-last-card drawing-deck) 
-         [last-card-key last-card-value] last-card
-         new-last-card    (update-card-index last-card-value discard-deck)
-         new-drawing-deck (dissoc drawing-deck last-card-key)
-         new-discard-deck (assoc discard-deck last-card-key new-last-card)
-         new-db (-> db
-                  (assoc-in [:drawing-deck :cards] new-drawing-deck)
-                  (assoc-in [:discard-deck :cards] new-discard-deck))] 
-     (dispatch [:animation/move-card! {:ref-key last-card-key}])
-     new-db)))
+   (let [cards (-> db :game :cards)
+         drawing-deck  (filter-by-origin cards :drawing-deck) 
+         last-card     (get-last-card drawing-deck)
+         [last-card-id _] last-card
+         new-cards      (assoc-in cards [last-card-id :origin] :discard-deck)]
+     (assoc db :cards new-cards))))
+         
