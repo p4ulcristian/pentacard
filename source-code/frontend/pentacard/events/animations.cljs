@@ -22,14 +22,16 @@
                      #js {:to 0.1
        
                           :config #js {:mass 2}})]
+   (println "hello" x-callback-id)
    (dispatch [:render/add-callback 
               x-callback-id
               #(callback-x ref x-spring x-callback-id)])))
 
 (reg-event-db
- :animation/move-card!
- (fn [db [_ {:keys [ref-key]}]]
-   (let [card-ref (get-in db [:refs ref-key])]
-     (animate-position! card-ref) 
+ :animation/draw-card!
+ (fn [db [_ object-key]]
+   (let [ref (get-in db [:objects :cards object-key])]
+     
+     (animate-position! ref) 
      db)))
    

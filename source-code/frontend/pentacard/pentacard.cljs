@@ -12,7 +12,6 @@
             ["@react-three/postprocessing" :refer [EffectComposer Bloom]]
             [frontend.pentacard.events]
             [frontend.pentacard.cards :as cards] 
-            [frontend.pentacard.new-method :as new-method]
             ["react" :as react]
             [frontend.starter-kit.utils.basic :as starter-kit] 
             ["@react-three/drei" :refer [Box Plane Grid CameraShake]]
@@ -74,7 +73,7 @@
 ;; Usage
 
 (defn boards [] 
-  (let [pentagon-points (subscribe [:db/get [:positions :pentagon :points]])
+  (let [pentagon-points (subscribe [:db/get [:positions :players 5]])
         square-points (subscribe [:db/get [:positions :square :points]])]
     (comment
       [:group 
@@ -135,7 +134,7 @@
                    :z-index 1000}}
      [:button {:on-click #(dispatch [:game/draw!])}
       "Draw card"]
-     [:button {:on-click #(dispatch [:game/start!])}
+     [:button {:on-click #(dispatch [:game/deal-cards!])}
       "Start game"]
      [:button {:on-click #(dispatch [:game/discard!])}
       "Discard card"]
@@ -182,7 +181,7 @@
     ;[mountains]
     
     [boards]
-    [new-method/view]
+    ;[new-method/view]
     ;[camera-shake]
     [cards/view]
     ]])

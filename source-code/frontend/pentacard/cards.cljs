@@ -94,19 +94,24 @@
 (defn card [card-id card-data]
   (let [texture (useTexture "/images/logo.webp") 
         {:keys [index origin]} card-data
+        origin-index? (number? origin)
+        players-count @(subscribe [:db/get [:players-count]])
         ref (react/useRef)] 
     (react/useEffect 
      (fn []
        (let [position (-> ref .-current .-position)
-             [x y z] @(subscribe [:db/get [:positions origin]])]
+             [x y z] @(subscribe [:db/get 
+                                  (if origin-index?
+                                    [:positions :players players-count origin]
+                                    [:positions origin])])] 
          (dispatch [:db/set [:objects :cards card-id] ref])
          (aset position "x" x)
          (aset position "y" y)
          (aset position "z" (* index 0.005)))
        (fn []))
      ;#js []
-     #js [origin]
-     )
+     #js [origin])
+     
     [:mesh
      {:ref ref}
      [:> Box {:args [0.1 0.1 0.001]

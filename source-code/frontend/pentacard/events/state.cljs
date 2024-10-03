@@ -55,8 +55,8 @@
    :players-count 5
    :positions {:drawing-deck [-0.1 -0.001 -0.001]
                :discard-deck [0.1  -0.001 -0.001]
-               :pentagon   {:points (pentagon-points 0.4)}
-               :square     {:points [[0.5 0.5 0] [0.5 -0.5 0] [-0.5 -0.5 0] [-0.5 0.5 0]]}
+               :players {5 (pentagon-points 0.4)
+                         4 [[0.5 0.5 0] [0.5 -0.5 0] [-0.5 -0.5 0] [-0.5 0.5 0]]} 
                :triangle {:points []}}})
 
 
