@@ -22,12 +22,3 @@ Watch & compile with with hot reloading:
 7. Enjoy.
 
 
-### New strategy 
-
-1. Events start animations. 
-2. Cards are rendered once 
-3. Cards positions setup once when state loads.
-4. Each event triggers an event then an animation.
-5. Cards are not coupled with their position.
-
-
