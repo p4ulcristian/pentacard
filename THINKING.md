@@ -7,4 +7,4 @@ The next step would be that the first player can draw a card. So we need player 
 a. it's my turn 
 b. it's somebody elses turn 
 
-a. we need to define what game states are there, and what steps are available from the different state
+We need Java backend, time to go sente and websockets.
