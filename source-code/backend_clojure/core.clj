@@ -12,6 +12,7 @@
        ;; [taoensso.sente.server-adapters.nginx-clojure :refer [get-sch-adapter]]
        ;; [taoensso.sente.server-adapters.aleph         :refer [get-sch-adapter]] 
    [reitit.ring :as ring]
+   [backend-clojure.html :as html]
    [org.httpkit.server :as hk-server]
    [ring.middleware.params :refer [wrap-params]])
   (:gen-class))
@@ -24,19 +25,25 @@
   (def ring-ajax-get-or-ws-handshake ajax-get-or-ws-handshake-fn)
   (def ch-chsk                       ch-recv) ; ChannelSocket's receive channel
   (def chsk-send!                    send-fn) ; ChannelSocket's send API fn
-  (def connected-uids                connected-uids) ; Watchable, read-only atom
-  )
+  (def connected-uids                connected-uids)) ; Watchable, read-only atom
+  
 
 (defn handler []
   (ring/ring-handler
    (ring/router
-    [["/api" {:get (fn [req] {:status 200 :body "API is up!"})}]
+    [["/" {:get (fn [req] {:status 200 :body (html/home-page)})}] 
+     ["/api" {:get (fn [req] {:status 200 :body "API is up!"})}]
      ["/chsk" {:get ring-ajax-get-or-ws-handshake
-               :post ring-ajax-post}]])
+               :post ring-ajax-post}]]) 
+   (ring/routes
+    (ring/create-resource-handler {:path "/"
+                                   :root "/frontend/public"}))
    {:middleware [wrap-params 
                  ring.middleware.keyword-params/wrap-keyword-params 
                  ring.middleware.anti-forgery/wrap-anti-forgery
-                 ring.middleware.session/wrap-session]}))
+                 ring.middleware.session/wrap-session]}
+   
+   ))
 
 ;; Step 4: Run the server
 (defn start-server []

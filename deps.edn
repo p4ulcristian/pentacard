@@ -1,4 +1,4 @@
-{:paths ["source-code"]
+{:paths ["source-code" "resources"]
  :deps {;; Sente for WebSockets
         com.taoensso/sente {:mvn/version "1.16.0"}
 
@@ -6,6 +6,7 @@
         ring/ring-core {:mvn/version "1.9.6"}
         http-kit/http-kit {:mvn/version "2.8.0"}
         ring/ring-anti-forgery {:mvn/version "1.3.1"}
+        hiccup/hiccup {:mvn/version "2.0.0-RC3"}
 
         ;; Optional: You can also use http-kit if you prefer
         ;; http-kit/http-kit {:mvn/version "2.5.3"}
