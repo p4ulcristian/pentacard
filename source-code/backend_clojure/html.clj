@@ -1,6 +1,7 @@
 (ns backend-clojure.html
   (:require [clojure.core.async :refer [<! go]]
-            [hiccup.core :as hiccup]))
+            [hiccup.core :as hiccup]
+            [ring.middleware.anti-forgery :refer [wrap-anti-forgery]]))
 
 (def version (atom "2024-10-06"))
 
@@ -127,6 +128,8 @@
      (basic-head-content)] 
     (body-container
      [:div
+      (let [csrf-token (force ring.middleware.anti-forgery/*anti-forgery-token*)]
+        [:div#sente-csrf-token {:data-csrf-token csrf-token}])
       (loading-animation-style)
       (loading-animation-component)
       (home-page-css)

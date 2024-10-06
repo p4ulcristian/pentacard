@@ -74,19 +74,14 @@
 
 (defn boards [] 
   (let [pentagon-points (subscribe [:db/get [:positions :players 5]])
-        square-points (subscribe [:db/get [:positions :square :points]])]
-    (comment
-      [:group 
-       {:rotation [0 (.-PI js/Math) 0]}
-       (map-indexed
-        (fn [i coordinate] [pentagon-plane i 0.5 coordinate (* i 
-                                                               (* 72 (/ (.-PI js/Math) 180)))]) 
-        @pentagon-points)]) 
+        square-points (subscribe [:db/get [:positions :square :points]])] 
     [:group
      {:rotation [0 (.-PI js/Math) 0]}
      (map-indexed
-      (fn [i coordinate] [pentagon-plane i 0.5 coordinate (* i
-                                                             (* 72 (/ (.-PI js/Math) 180)))])
+      (fn [i coordinate] 
+        ^{:key i}
+        [pentagon-plane i 0.5 coordinate (* i
+                                            (* 72 (/ (.-PI js/Math) 180)))])
       @pentagon-points)]))
    
   

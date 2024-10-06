@@ -2,10 +2,13 @@
   (:require
    [clojure.core.async :refer [<! go-loop]]
    [taoensso.sente :as sente]
+   [ring.middleware.defaults :as middleware]
    [ring.middleware.reload :refer [wrap-reload]]
    [ring.middleware.anti-forgery :refer [wrap-anti-forgery]] ; <--- Recommended
    [ring.middleware.keyword-params :refer [wrap-keyword-params]]
    [ring.middleware.session :refer [wrap-session]]
+   [ring.middleware.transit :refer [wrap-transit-params]]
+   [ring.middleware.gzip :refer [wrap-gzip]]
    
        ;; Uncomment a web-server adapter --->  
    [taoensso.sente.server-adapters.http-kit      :refer [get-sch-adapter]]
@@ -29,7 +32,7 @@
   (def connected-uids                connected-uids)) ; Watchable, read-only atom
   
 
-(defn handler []
+(def app
   (ring/ring-handler
    (ring/router
     [["/" {:get (fn [req] {:status 200 :body (html/home-page)})}] 
@@ -39,19 +42,28 @@
    (ring/routes
     (ring/create-resource-handler {:path "/"
                                    :root "/frontend/public"}))
-   {:middleware [#(wrap-reload % {:dirs ["source-code/backend_clojure"]})
-                 wrap-params 
+   {:middleware [middleware/site-defaults
                  ring.middleware.keyword-params/wrap-keyword-params 
+                 wrap-params 
                  ring.middleware.anti-forgery/wrap-anti-forgery
-                 ring.middleware.session/wrap-session]} 
+                 ring.middleware.session/wrap-session  
+                 wrap-transit-params
+                 ;wrap-gzip
+                 ]}
    ))
 
-;; Step 4: Run the server
-(defn start-server []
-  (hk-server/run-server (handler) {:port 3000 :join? false})
-  (println "Server running on http://localhost:3000"))
 
+(defonce server (atom nil))
 
-;; Step 6: Initialize everything
-(defn -main []
-  (start-server))
+(defn stop-server []
+  (when-not (nil? @server)
+    ;; graceful shutdown: wait 100ms for existing requests to be finished
+    ;; :timeout is optional, when no timeout, stop immediately
+    (@server :timeout 100)
+    (reset! server nil)))
+
+(defn -main [& args]
+  ;; The #' is useful when you want to hot-reload code
+  ;; You may want to take a look: https://github.com/clojure/tools.namespace
+  ;; and https://http-kit.github.io/migration.html#reload
+  (reset! server (hk-server/run-server #'app {:port 3000})))
