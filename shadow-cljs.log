@@ -4,28 +4,55 @@
    See https://shadow-cljs.github.io/docs/UsersGuide.html#project-install
 
 ------------------------------------------------------------------------------
-shadow-cljs - config: /Users/paulcristian/Projects/zgen/wizard/shadow-cljs.edn
-[2024-07-08 02:26:27.666 - WARNING] TCP Port 9630 in use.
-shadow-cljs - server version: 2.28.9 running at http://localhost:9631
-shadow-cljs - nREPL server started on port 56508
-shadow-cljs - watching build :backend
-[:backend] Configuring build.
-[:backend] Compiling ...
-[:backend] Build completed. (141 files, 1 compiled, 1 warnings, 1.41s)
+shadow-cljs - config: /Users/paulcristian/Projects/paul/pentacard/shadow-cljs.edn
+shadow-cljs - connected to server
 
-[1m------ WARNING #1 - :infer-warning ---------------------------------------------[0m
- File: /Users/paulcristian/Projects/zgen/wizard/source-code/backend/cloudflare/upload.cljs:21:46
---------------------------------------------------------------------------------
-[2m  18 |   (.append form-data "metadata" (.stringify js/JSON (clj->js {:hello "there"})))[0m
-[2m  19 |   (-> (axios/post cloudflare-update-url form-data[0m
-[2m  20 |                   (clj->js[0m
-[1m  21 |                    {:headers (merge (js->clj (.getHeaders  form-data))[0m
-----------------------------------------------------^---------------------------
- [33;1mCannot infer target type in expression (. form-data getHeaders)[0m
---------------------------------------------------------------------------------
-[2m  22 |                                     {"Authorization" (str "Bearer " cloudflare-api-token)})}))[0m
-[2m  23 |       (.then (fn [response][0m
-[2m  24 |                (let [cloudflare-id (-> response .-data .-result .-id)] [0m
-[2m  25 |                  (if success-fn [0m
---------------------------------------------------------------------------------
-Worker shutdown.
+shadow-cljs - watching build :frontend
+already started
+{:build-id :frontend}
+ExceptionInfo: already started
+	shadow.cljs.devtools.server.supervisor/start-worker (supervisor.clj:28)
+	shadow.cljs.devtools.server.supervisor/start-worker (supervisor.clj:20)
+	shadow.cljs.devtools.api/start-worker (api.clj:117)
+	shadow.cljs.devtools.api/start-worker (api.clj:113)
+	shadow.cljs.devtools.api/watch* (api.clj:187)
+	shadow.cljs.devtools.api/watch* (api.clj:173)
+	shadow.cljs.devtools.server/watch-builds (server.clj:625)
+	shadow.cljs.devtools.server/watch-builds (server.clj:608)
+	shadow.cljs.devtools.server/from-cli (server.clj:681)
+	shadow.cljs.devtools.server/from-cli (server.clj:645)
+	clojure.lang.Var.applyTo (Var.java:705)
+	clojure.core/apply (core.clj:667)
+	clojure.core/apply (core.clj:662)
+	shadow.cljs.devtools.cli-actual/lazy-invoke (cli_actual.clj:23)
+	shadow.cljs.devtools.cli-actual/lazy-invoke (cli_actual.clj:20)
+	shadow.cljs.devtools.cli-actual/blocking-action (cli_actual.clj:129)
+	shadow.cljs.devtools.cli-actual/blocking-action (cli_actual.clj:116)
+	shadow.cljs.devtools.cli-actual/main (cli_actual.clj:177)
+	shadow.cljs.devtools.cli-actual/main (cli_actual.clj:132)
+	clojure.core/apply (core.clj:671)
+	clojure.core/apply (core.clj:662)
+	shadow.cljs.devtools.cli-actual/from-remote (cli_actual.clj:210)
+	shadow.cljs.devtools.cli-actual/from-remote (cli_actual.clj:201)
+	clojure.lang.Var.invoke (Var.java:393)
+	shadow.cljs.devtools.cli/from-remote (cli.clj:79)
+	shadow.cljs.devtools.cli/from-remote (cli.clj:77)
+	shadow.user/eval17357 (NO_SOURCE_FILE:1)
+	shadow.user/eval17357 (NO_SOURCE_FILE:1)
+	clojure.lang.Compiler.eval (Compiler.java:7194)
+	clojure.lang.Compiler.eval (Compiler.java:7184)
+	clojure.lang.Compiler.eval (Compiler.java:7149)
+	clojure.core/eval (core.clj:3215)
+	clojure.core/eval (core.clj:3211)
+	shadow.cljs.devtools.server.socket-repl/repl/fn--17206 (socket_repl.clj:61)
+	clojure.main/repl/read-eval-print--9206/fn--9209 (main.clj:437)
+	clojure.main/repl/read-eval-print--9206 (main.clj:437)
+	clojure.main/repl/fn--9215 (main.clj:458)
+	clojure.main/repl (main.clj:458)
+	clojure.main/repl (main.clj:368)
+	shadow.cljs.devtools.server.socket-repl/repl (socket_repl.clj:28)
+	shadow.cljs.devtools.server.socket-repl/repl (socket_repl.clj:26)
+	shadow.cljs.devtools.server.socket-repl/connection-loop (socket_repl.clj:102)
+	shadow.cljs.devtools.server.socket-repl/connection-loop (socket_repl.clj:72)
+	shadow.cljs.devtools.server.socket-repl/start/fn--17221/fn--17222/fn--17224 (socket_repl.clj:142)
+	java.lang.Thread.run (Thread.java:833)

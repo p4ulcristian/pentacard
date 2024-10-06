@@ -2,6 +2,7 @@
   (:require
    [clojure.core.async :refer [<! go-loop]]
    [taoensso.sente :as sente]
+   [ring.middleware.reload :refer [wrap-reload]]
    [ring.middleware.anti-forgery :refer [wrap-anti-forgery]] ; <--- Recommended
    [ring.middleware.keyword-params :refer [wrap-keyword-params]]
    [ring.middleware.session :refer [wrap-session]]
@@ -38,11 +39,11 @@
    (ring/routes
     (ring/create-resource-handler {:path "/"
                                    :root "/frontend/public"}))
-   {:middleware [wrap-params 
+   {:middleware [#(wrap-reload % {:dirs ["source-code/backend_clojure"]})
+                 wrap-params 
                  ring.middleware.keyword-params/wrap-keyword-params 
                  ring.middleware.anti-forgery/wrap-anti-forgery
-                 ring.middleware.session/wrap-session]}
-   
+                 ring.middleware.session/wrap-session]} 
    ))
 
 ;; Step 4: Run the server
