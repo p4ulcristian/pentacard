@@ -9,7 +9,7 @@
                 [clj-commons/secretary "1.2.4"] 
                 [metosin/reitit        "0.7.0"]
                 [expound/expound       "0.9.0"]
-                [com.taoensso/sente "1.16.0"]]
+                [com.taoensso/sente "1.19.2"]]
         
  :builds {:frontend {:target :browser
                      :output-dir "resources/frontend/public/js"
