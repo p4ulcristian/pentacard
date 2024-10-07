@@ -1,4 +1,4 @@
-(ns backend-clojure.html
+(ns backend-clojure.view
   (:require [clojure.core.async :refer [<! go]]
             [hiccup.core :as hiccup]
             [ring.middleware.anti-forgery :refer [wrap-anti-forgery]]))
@@ -121,18 +121,17 @@
                        :background :transparent}}
    content])
 
-(defn home-page []
-  (hiccup/html
-   [:html
-    [:head
-     (basic-head-content)] 
-    (body-container
-     [:div
-      (let [csrf-token (force ring.middleware.anti-forgery/*anti-forgery-token*)]
-        [:div#sente-csrf-token {:data-csrf-token csrf-token}])
-      (loading-animation-style)
-      (loading-animation-component)
-      (home-page-css)
-      (app-div)
-      (home-page-js)])]))
+(defn home-page [] 
+  [:html
+   [:head
+    (basic-head-content)] 
+   (body-container
+    [:div 
+     (let [csrf-token (force ring.middleware.anti-forgery/*anti-forgery-token*)]
+       [:div#sente-csrf-token {:data-csrf-token csrf-token}])
+     (loading-animation-style)
+     (loading-animation-component)
+     (home-page-css)
+     (app-div)
+     (home-page-js)])])
 

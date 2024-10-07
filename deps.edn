@@ -1,15 +1,19 @@
 {:paths ["source-code" "resources"]
  :deps {;; Sente for WebSockets
-        com.taoensso/sente {:mvn/version "1.16.0"}
+        com.taoensso/sente {:mvn/version "1.19.2"}
 
         ;; Ring for HTTP server
+        org.clojure/clojure       {:mvn/version "1.11.1"}
         ring/ring              {:mvn/version "1.12.2"}
         http-kit/http-kit      {:mvn/version "2.8.0"}
         ring/ring-anti-forgery {:mvn/version "1.3.1"}
         hiccup/hiccup {:mvn/version "2.0.0-RC3"}
         bk/ring-gzip {:mvn/version "0.3.0"}
+        compojure/compojure                 {:mvn/version "1.7.0"}
         ring-transit/ring-transit {:mvn/version "0.1.6"}
         ring/ring-defaults         {:mvn/version "0.3.0"}
+        com.cognitect/transit-clj  {:mvn/version "1.0.333"}
+        com.cognitect/transit-cljs {:mvn/version "0.8.280"}
 
         ;; Optional: You can also use http-kit if you prefer
         ;; http-kit/http-kit {:mvn/version "2.5.3"}

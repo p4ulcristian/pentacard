@@ -1,30 +1,16 @@
-
-(ns backend-clojure.core
+(ns backend-clojure.sente
   "Official Sente reference example: server"
   {:author "Peter Taoussanis (@ptaoussanis)"}
 
   (:require
    [clojure.string     :as str]
    [ring.middleware.defaults]
-   [clojure.core.async :refer [<! go-loop]]
-   [taoensso.sente :as sente]
-   [ring.middleware.params :refer [wrap-params]]
-   [ring.middleware.defaults :as middleware]
-   [ring.middleware.reload :refer [wrap-reload]]
-   [ring.middleware.anti-forgery :refer [wrap-anti-forgery]] ; <--- Recommended
-   [ring.middleware.keyword-params :refer [wrap-keyword-params]]
-   [ring.middleware.session :refer [wrap-session]]
-   [ring.middleware.transit :refer [wrap-transit-params]]
-   [ring.middleware.gzip :refer [wrap-gzip]]
-   [reitit.ring :as ring]
-   [ring.middleware.anti-forgery :as anti-forgery]
-   [compojure.core     :as comp :refer [defroutes GET POST]]
-   [compojure.route    :as route]
-   [backend-clojure.view :as view]
+   [ring.middleware.anti-forgery :as anti-forgery] 
    [hiccup.core        :as hiccup]
    [clojure.core.async :as async  :refer [<! <!! >! >!! put! chan go go-loop]]
    [taoensso.encore    :as encore :refer [have have?]]
    [taoensso.timbre    :as timbre]
+   [taoensso.sente     :as sente]
 
    ;;; TODO Choose (uncomment) a supported web server + adapter -------------
    [org.httpkit.server :as http-kit]
@@ -53,9 +39,7 @@
 ;;;; Logging config
 
 (defonce   min-log-level_ (atom nil))
-(defn- set-min-log-level! [level]
-  (sente/set-min-log-level! level) ; Min log level for internal Sente namespaces
-  (timbre/set-ns-min-level! level) ; Min log level for this           namespace
+(defn- set-min-log-level! [level] 
   (reset! min-log-level_    level))
 
 (set-min-log-level! #_:trace :debug #_:info #_:warn)
@@ -84,21 +68,70 @@
   )
 
 ;; We can watch this atom for changes
-(add-watch connected-uids_ :connected-uids
-           (fn [_ _ old new]
-             (when (not= old new)
-               (timbre/infof "Connected uids change: %s" new))))
+;; (add-watch connected-uids_ :connected-uids
+;;            (fn [_ _ old new]
+;;              (when (not= old new)
+;;                (timbre/infof "Connected uids change: %s" new))))
 
 ;;;; Ring handlers
 
 (defn landing-pg-handler [ring-req]
   (hiccup/html
-   
-     (view/home-page)
+   (let [csrf-token
+          ;; (:anti-forgery-token ring-req) ; Also an option
+         (force anti-forgery/*anti-forgery-token*)]
+     [:div#sente-csrf-token {:data-token csrf-token}])
+
     ;; Convey server's min-log-level to client
+   [:div#sente-min-log-level {:data-level (name @min-log-level_)}]
+
+   [:h3 "Sente reference example"]
+   [:p
+    "A " [:i "random"] " " [:strong [:code ":ajax/:auto"]]
+    " connection mode has been selected (see " [:strong "client output"] ")."
+    [:br]
+    "To " [:strong "re-randomize"] ", hit your browser's reload/refresh button."]
+   [:ul
+    [:li [:strong "Server output:"] " → " [:code "*std-out*"]]
+    [:li [:strong "Client output:"] " → Below textarea and/or browser console"]]
+   [:textarea#output {:style "width: 100%; height: 200px;" :wrap "off"}]
+
+   [:section
+    [:h4 "Standard Controls"]
+    [:p
+     [:button#btn-send-with-reply {:type "button"} "chsk-send! (with reply)"] " "
+     [:button#btn-send-wo-reply   {:type "button"} "chsk-send! (without reply)"] " "]
+    [:p
+     [:button#btn-test-broadcast        {:type "button"} "Test broadcast (server>user async push)"] " "
+     [:button#btn-toggle-broadcast-loop {:type "button"} "Toggle broadcast loop"]]
+    [:p
+     [:button#btn-disconnect {:type "button"} "Disconnect"] " "
+     [:button#btn-reconnect  {:type "button"} "Reconnect"]]
+    [:p
+     [:button#btn-login  {:type "button"} "Log in with user-id →"] " "
+     [:input#input-login {:type :text :placeholder "user-id"}]]
+    [:ul {:style "color: #808080; font-size: 0.9em;"}
+     [:li "Log in with a " [:a {:href "https://github.com/ptaoussanis/sente/wiki/Client-and-user-ids#user-ids" :target :_blank} "user-id"]
+      " so that the server can directly address that user's connected clients."]
+     [:li "Open this page with " [:strong "multiple browser windows"] " to simulate multiple clients."]
+     [:li "Use different browsers and/or " [:strong "Private Browsing / Incognito mode"] " to simulate multiple users."]]]
+
+   [:hr]
+
+   [:section
+    [:h4 "Debug and Testing Controls"]
+    [:p
+     [:button#btn-toggle-logging       {:type "button"} "Toggle minimum log level"] " "
+     [:button#btn-toggle-bad-conn-rate {:type "button"} "Toggle simulated bad conn rate"]]
+    [:p
+     [:button#btn-break-with-close {:type "button"} "Simulate broken conn (with on-close)"] " "
+     [:button#btn-break-wo-close   {:type "button"} "Simulate broken conn (w/o on-close)"]]
+    [:p
+     [:button#btn-repeated-logins  {:type "button"} "Test repeated logins"] " "
+     [:button#btn-connected-uids   {:type "button"} "Print connected uids"]]]
+
+   [:script {:src "main.js"}] ; Include our cljs target
    ))
-
-
 
 (defn login-handler
   "Here's where you'll add your server-side login/auth procedure (Friend, etc.).
@@ -110,26 +143,7 @@
     (timbre/debugf "Login request: %s" params)
     {:status 200 :session (assoc session :uid user-id)}))
 
-(defroutes app
-  (GET  "/"      ring-req (landing-pg-handler            ring-req))
-  (GET  "/chsk"  ring-req (ring-ajax-get-or-ws-handshake ring-req))
-  (POST "/chsk"  ring-req (ring-ajax-post                ring-req))
-  (POST "/login" ring-req (login-handler                 ring-req))
-  (route/resources "/" {:root "frontend/public"}) ; Static files, notably public/main.js (our cljs target)
-  (route/not-found "<h1>Page not found</h1>"))
 
-
-
-(def main-ring-handler
-  "**NB**: Sente requires the Ring `wrap-params` + `wrap-keyword-params`
-  middleware to work. These are included with
-  `ring.middleware.defaults/wrap-defaults` - but you'll need to ensure
-  that they're included yourself if you're not using `wrap-defaults`.
-
-  You're also STRONGLY recommended to use `ring.middleware.anti-forgery`
-  or something similar."
-  (ring.middleware.defaults/wrap-defaults
-   app ring.middleware.defaults/site-defaults))
 
 ;;;; Some server>user async push examples
 
@@ -229,18 +243,6 @@
     (set-min-log-level! new-val)
     (?reply-fn          new-val)))
 
-(defmethod -event-msg-handler :example/toggle-bad-conn-rate
-  [{:as ev-msg :keys [?reply-fn]}]
-  (let [new-val
-        (case sente/*simulated-bad-conn-rate*
-          nil  0.25
-          0.25 0.5
-          0.5  0.75
-          0.75 1.0
-          1.0  nil)]
-
-    (alter-var-root #'sente/*simulated-bad-conn-rate* (constantly new-val))
-    (?reply-fn new-val)))
 
 (defmethod -event-msg-handler :example/connected-uids
   [{:as ev-msg :keys [?reply-fn]}]
@@ -259,59 +261,3 @@
   (reset! router_
           (sente/start-server-chsk-router!
            ch-chsk event-msg-handler)))
-
-;;;; Init stuff
-
-(defonce    web-server_ (atom nil)) ; (fn stop [])
-(defn  stop-web-server! [] (when-let [stop-fn @web-server_] (stop-fn)))
-(defn start-web-server! [& [port]]
-  (stop-web-server!)
-  (let [port 4000 ;(or port 0) ; 0 => Choose any available port
-        ring-handler (var main-ring-handler)
-
-        [port stop-fn]
-        ;;; TODO Choose (uncomment) a supported web server ------------------
-        (let [stop-fn (http-kit/run-server ring-handler {:port port})]
-          [(:local-port (meta stop-fn)) (fn stop-fn [] (stop-fn :timeout 100))])
-        ;;
-        ;; (let [server (immutant/run ring-handler :port port)]
-        ;;   [(:port server) (fn stop-fn [] (immutant/stop server))])
-        ;;
-        ;; (let [port (nginx-clojure/run-server ring-handler {:port port})]
-        ;;   [port (fn stop-fn [] (nginx-clojure/stop-server))])
-        ;;
-        ;; (let [server (aleph/start-server ring-handler {:port port})
-        ;;       p (promise)]
-        ;;   (future @p) ; Workaround for Ref. https://goo.gl/kLvced
-        ;;   ;; (aleph.netty/wait-for-close server)
-        ;;   [(aleph.netty/port server)
-        ;;    (fn stop-fn [] (.close ^java.io.Closeable server) (deliver p nil))])
-        ;; ------------------------------------------------------------------
-
-        uri (format "http://localhost:%s/" port)]
-
-    (timbre/infof "HTTP server is running at `%s`" uri)
-    (try
-      (.browse (java.awt.Desktop/getDesktop) (java.net.URI. uri))
-      (catch Exception _))
-
-    (reset! web-server_ stop-fn)))
-
-(defn stop!  [] (stop-router!) (stop-web-server!))
-(defn start! []
-  (timbre/reportf "Sente version: %s" sente/sente-version)
-  (timbre/reportf "Min log level: %s" @min-log-level_)
-  (start-router!)
-  (let [stop-fn (start-web-server!)]
-    @auto-loop_
-    stop-fn))
-
-(defn -main "For `lein run`, etc." [] (start!))
-
-(comment
-  (start!) ; Eval this at REPL to start server via REPL
-  (test-broadcast!)
-
-  (broadcast! [:example/foo])
-  @connected-uids_
-  @conns_)
